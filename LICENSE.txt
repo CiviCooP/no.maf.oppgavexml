@@ -1,5 +1,5 @@
 Package: no.maf.oppgavexml
-Copyright (C) 2014, Erik Hommel <hommel@ee-atwork.nl>
+Copyright (C) 2014, CiviCooP <helpdesk@civicoop.org> 
 Licensed under the GNU Affero Public License 3.0 (below).
 
 -------------------------------------------------------------------------------
