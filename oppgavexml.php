@@ -46,6 +46,7 @@ function oppgavexml_civicrm_uninstall() {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
 function oppgavexml_civicrm_enable() {
+  CRM_Oppgavexml_OptionGroup::create_status_option_group();
   return _oppgavexml_civix_civicrm_enable();
 }
 
