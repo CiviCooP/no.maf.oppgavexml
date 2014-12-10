@@ -107,3 +107,16 @@ function oppgavexml_civicrm_caseTypes(&$caseTypes) {
 function oppgavexml_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _oppgavexml_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
+/**
+ * Implementation of hook civicrm_navigationMenu
+ * 
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
+ */
+function oppgavexml_civicrm_navigationMenu( &$params ) {
+  $tax_year_list = array (
+    'name'          =>  ts('Skatteinnberetninger'),
+    'url'           =>  CRM_Utils_System::url('civicrm/taxyearlist'),
+    'permission'    => 'administer CiviCRM',
+  );
+  _oppgavexml_civix_insert_navigation_menu($params, 'Contributions', $tax_year_list);
+}

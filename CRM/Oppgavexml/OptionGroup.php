@@ -49,6 +49,62 @@ class CRM_OppgaveXml_OptionGroup {
     }
   }
   /**
+   * Function to retrieve a status id
+   * 
+   * @param string $option_label
+   * @return string $value
+   * @throws Exception when option group tax_declaration_year_status not found
+   */
+  public static function get_status_option_value($option_label) {
+    $option_group_params = array(
+      'name' => 'tax_declaration_year_status',
+      'return' => 'id');
+    try {
+      $option_group_id = civicrm_api3('OptionGroup', 'Getvalue', $option_group_params);
+    } catch (CiviCRM_API3_Exception $ex) {
+      throw new Exception('Could not find option group with name tax_declaration_year_status, '
+        . 'error from API OptionGroup Getvalue: '.$ex->getMessage());
+    }
+    $option_value_params = array(
+      'option_group_id' => $option_group_id,
+      'label' => $option_label,
+      'return' => 'value');
+    try {
+      $value = civicrm_api3('OptionValue', 'Getvalue', $option_value_params);
+    } catch (CiviCRM_API3_Exception $ex) {
+      $value = '';
+    }
+    return $value;
+  }
+  /**
+   * Function to retrieve a status label
+   * 
+   * @param string $option_value
+   * @return string $label
+   * @throws Exception when option group tax_declaration_year_status not found
+   */
+  public static function get_status_option_label($option_value) {
+    $option_group_params = array(
+      'name' => 'tax_declaration_year_status',
+      'return' => 'id');
+    try {
+      $option_group_id = civicrm_api3('OptionGroup', 'Getvalue', $option_group_params);
+    } catch (CiviCRM_API3_Exception $ex) {
+      throw new Exception('Could not find option group with name tax_declaration_year_status, '
+        . 'error from API OptionGroup Getvalue: '.$ex->getMessage());
+    }
+    $option_value_params = array(
+      'option_group_id' => $option_group_id,
+      'value' => $option_value,
+      'return' => 'label');
+    try {
+      $label = civicrm_api3('OptionValue', 'Getvalue', $option_value_params);
+    } catch (CiviCRM_API3_Exception $ex) {
+      $label = '';
+    }
+    return $label;
+  }
+  /**
    * Function to create option values for tax declaration year status
    * 
    * @param int $option_group_id
@@ -56,7 +112,7 @@ class CRM_OppgaveXml_OptionGroup {
    * @access protected
    * @static
    */
-  protected static function _oppgavexml_create_status_option_values($option_group_id) {
+  protected static function create_status_option_values($option_group_id) {
     $status_labels = array('New', 'Loaded', 'Exported', 'Reloaded');
     $value = 1;
     foreach ($status_labels as $status_label) {

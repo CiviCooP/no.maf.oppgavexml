@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/taxyearlist</path>
+    <page_callback>CRM_Oppgavexml_Page_TaxYearList</page_callback>
+    <title>TaxYearList</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/oppgavelist</path>
+    <page_callback>CRM_Oppgavexml_Page_OppgaveList</page_callback>
+    <title>OppgaveList</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

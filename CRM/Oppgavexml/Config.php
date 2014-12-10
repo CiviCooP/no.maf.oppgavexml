@@ -27,6 +27,12 @@ class CRM_Oppgavexml_Config {
    */
   protected $_tax_declaration_status = array();
   /*
+   * property for custom group and custom fields for personsnummer and organisasjonsnummer
+   */
+  protected $_contact_custom_group_id = null;
+  protected $_personsnummer_custom_field_id = null;
+  protected $_organisasjonsnummer_custom_field_id = null;
+  /*
    * properties to hold the information about the sending organisation
    * and the file type
    */
@@ -56,6 +62,34 @@ class CRM_Oppgavexml_Config {
     $this->set_min_deductible_amount();
     $this->set_sender_info();
     $this->set_xml_headers();
+    $this->set_custom_data();
+  }
+  /**
+   * Function to return the custom group id for the maf_norway_import custom group
+   * 
+   * @return int
+   * @access public
+   */
+  public function get_contact_custom_group_id() {
+    return $this->_contact_custom_group_id;
+  }
+  /**
+   * Function to return the custom field id for personsnummer
+   * 
+   * @return int
+   * @access public
+   */
+  public function get_personsnummer_custom_field_id() {
+    return $this->_personsnummer_custom_field_id;
+  }
+  /**
+   * Function to return the custom field id for organisasjonsnummer
+   * 
+   * @return int
+   * @access public
+   */
+  public function get_organisasjonsnummer_custom_field_id() {
+    return $this->_organisasjonsnummer_custom_field_id;
   }
   /**
    * Function to return the sender kilde system
@@ -263,7 +297,7 @@ class CRM_Oppgavexml_Config {
    * @access protected
    */
   protected function set_sender_info() {
-    $this->_sender_kilde_system = 'psgs.no';
+    $this->_sender_kilde_system = 'CiviCRM';
     $this->_sender_organisasjonsnummer = '980421899';
     $this->_sender_organisasjonsnavn = 'Mission Aviation Fellowship Norge';
     $this->_sender_kontakt_navn = 'Steinar Sødal';
@@ -284,5 +318,32 @@ class CRM_Oppgavexml_Config {
     $this->_melding_xmlns = 'urn:ske:fastsetting:innsamling:gavefrivilligorganisasjon:v2';
     $this->_melding_xmlns_xsi = 'http://www.w3.org/2001/XMLSchema-instance';
     $this->_melding_xsi_schema_location = 'urn:ske:fastsetting:innsamling:gavefrivilligorganisasjon:v2 gavefrivilligorganisasjon_v2_0.xsd';
+  }
+  /**
+   * Function to set custom data
+   * 
+   * @throws Exception when custom group maf_norway_import not found
+   * @access protected
+   */
+  protected function set_custom_data() {
+    $custom_group_params = array(
+      'name' => 'maf_norway_import',
+      'return' => 'id');
+    try {
+      $this->_contact_custom_group_id = civicrm_api3('CustomGroup', 'Getvalue', $custom_group_params);
+    } catch (CiviCRM_API3_Exception $ex) {
+      throw new Exception('Could not find custom group with name maf_norway_import, '
+        . 'error from API CustomGroup Getvalue: '.$ex->getMessage());
+    }
+    $custom_fields = civicrm_api3('CustomField', 'Get', 
+      array('custom_group_id' => $this->_contact_custom_group_id));
+    foreach ($custom_fields['values'] as $custom_field) {
+      if ($custom_field['name'] == 'personsnummer') {
+        $this->_personsnummer_custom_field_id = $custom_field['id'];
+      }
+      if ($custom_field['name'] == 'organisasjonsnummer') {
+        $this->_organisasjonsnummer_custom_field_id = $custom_field['id'];
+      }
+    }
   }
 }

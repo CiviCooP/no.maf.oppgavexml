@@ -36,8 +36,8 @@ class CRM_Oppgavexml_DAO_Oppgave extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'required' => true
         ) ,
-        'year' => array(
-          'name' => 'year',
+        'oppgave_year' => array(
+          'name' => 'oppgave_year',
           'type' => CRM_Utils_Type::T_STRING,
           'maxlength' => 4,
         ) ,
@@ -54,6 +54,11 @@ class CRM_Oppgavexml_DAO_Oppgave extends CRM_Core_DAO {
           'name' => 'donor_name',
           'type' => CRM_Utils_Type::T_STRING,
           'maxlength' => 128,
+        ),
+        'donor_number' => array(
+          'name' => 'donor_number',
+          'type' => CRM_Utils_Type::T_STRING,
+          'maxlength' => 45,
         ),
         'deductible_amount' => array(
           'name' => 'deductible_amount',
@@ -90,10 +95,11 @@ class CRM_Oppgavexml_DAO_Oppgave extends CRM_Core_DAO {
     if (!(self::$_fieldKeys)) {
       self::$_fieldKeys = array(
         'id' => 'id', 
-        'year' => 'year',
+        'oppgave_year' => 'oppgave_year',
         'contact_id' => 'contact_id',
         'donor_type' => 'donor_type',
         'donor_name' => 'donor_name',
+        'donor_number' => 'donor_number',
         'deductible_amount' => 'deductible_amount',
         'loaded_date' => 'loaded_date',
         'last_modified_date' => 'last_modified_date',

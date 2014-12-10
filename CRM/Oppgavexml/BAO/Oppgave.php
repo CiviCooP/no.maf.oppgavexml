@@ -1,13 +1,13 @@
 <?php
 /**
- * BAO Skatteinnberetninger for dealing with tax declaration years
+ * BAO Oppgave for dealing with tax declaration contact records
  * 
  * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
  * 
  * Copyright (C) 2014 Coöperatieve CiviCooP U.A. <http://www.civicoop.org>
  * Licensed to MAF Norge <http://www.maf.no> and CiviCRM under the AGPL-3.0
  */
-class CRM_Oppgavexml_BAO_Skatteinnberetninger extends CRM_Oppgavexml_DAO_Skatteinnberetninger {
+class CRM_Oppgavexml_BAO_Oppgave extends CRM_Oppgavexml_DAO_Oppgave {
   /**
    * Function to get values
    * 
@@ -18,25 +18,25 @@ class CRM_Oppgavexml_BAO_Skatteinnberetninger extends CRM_Oppgavexml_DAO_Skattei
    */
   public static function get_values($params) {
     $result = array();
-    $skatteinnberetninger = new CRM_Oppgavexml_BAO_Skatteinnberetninger();
+    $oppgave = new CRM_Oppgavexml_BAO_Oppgave();
     if (!empty($params)) {
       $fields = self::fields();
       foreach ($params as $key => $value) {
         if (isset($fields[$key])) {
-          $skatteinnberetninger->$key = $value;
+          $oppgave->$key = $value;
         }
       }
     }
-    $skatteinnberetninger->find();
-    while ($skatteinnberetninger->fetch()) {
+    $oppgave->find();
+    while ($oppgave->fetch()) {
       $row = array();
-      self::storeValues($skatteinnberetninger, $row);
-      $result[$row['year']] = $row;
+      self::storeValues($oppgave, $row);
+      $result[$row['id']] = $row;
     }
     return $result;
   }
   /**
-   * Function to add or update skatteinnberetninger
+   * Function to add or update oppgave
    * 
    * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
    * @param array $params 
@@ -47,17 +47,17 @@ class CRM_Oppgavexml_BAO_Skatteinnberetninger extends CRM_Oppgavexml_DAO_Skattei
   public static function add($params) {
     $result = array();
     if (empty($params)) {
-      throw new Exception('Params can not be empty when adding or updating a tax declaration year');
+      throw new Exception('Params can not be empty when adding or updating a tax declaration contact record');
     }
-    $skatteinnberetninger = new CRM_Oppgavexml_BAO_Skatteinnberetninger();
+    $oppgave = new CRM_Oppgavexml_BAO_Oppgave();
     $fields = self::fields();
     foreach ($params as $key => $value) {
       if (isset($fields[$key])) {
-        $skatteinnberetninger->$key = $value;
+        $oppgave->$key = $value;
       }
     }
-    $skatteinnberetninger->save();
-    self::storeValues($skatteinnberetninger, $result);
+    $oppgave->save();
+    self::storeValues($oppgave, $result);
     return $result;
   }
 }
