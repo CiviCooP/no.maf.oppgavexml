@@ -33,7 +33,11 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
     $leveranse->addChild('leveransetype', $this->_leveranse_type);
     $this->add_donor_lines($leveranse);
     $this->add_footer($leveranse);
-    $this->_xml->asXML($this->_xml_file_path.'testeh.xml');
+    $this->set_file_name();
+    $this->_xml->asXML($this->_xml_file_name);
+  }
+  protected function set_file_name() {
+    $this->_xml_file_name = $this->_xml_file_path.'skatteinnberetninger_'.$this->_tax_year.'.xml';
   }
   /**
    * Function to add footer to XML object
@@ -151,7 +155,7 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
    * @access public
    */
   public function get_file_name() {
-    return $this->_xml_file_name();
+    return $this->_xml_file_name;
   }
   /**
    * Function to write the header with the sending org info
@@ -160,7 +164,7 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
    */
   protected function write_header() {
     $leveranse = $this->_xml_object->addChild('leveranse');
-    $leveransethis->_xml_object->addChild('kildesystem', $this->_sender_kilde_system);
+    $leveranse->addChild('kildesystem', $this->_sender_kilde_system);
     $this->_xml_object->addChild('oppgavegiver');
     $this->_xml_object->addChild();
   }

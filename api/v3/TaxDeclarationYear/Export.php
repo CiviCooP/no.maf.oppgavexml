@@ -26,6 +26,12 @@ function civicrm_api3_tax_declaration_year_export($params) {
   $xml = new CRM_Oppgavexml_ExportYear();
   $xml->export_year($params['year']);
   $file_name = $xml->get_file_name();
+  /*
+   * set status of year to exported
+   */
+  $query = ' UPDATE civicrm_skatteinnberetninger SET status_id = 3 WHERE year = %1';
+  $query_params = array(1 => array($params['year'], 'Positive'));
+  CRM_Core_DAO::executeQuery($query, $query_params);
   $return_values = array('File succesfully exported to '.$file_name);
   return civicrm_api3_create_success($return_values, $params, 'TaxDeclarationYear', 'Export');
 }

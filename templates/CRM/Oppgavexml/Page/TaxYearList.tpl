@@ -1,12 +1,7 @@
 <div class="crm-content-block crm-block">
   <div id="help">
-    The existing Tax Declaration Years are listed below. You can manage, load, export, reload or delete them from this screen 
+    The existing Tax Declaration Years are listed below. You can manage or delete them from this screen 
     (depending on the status of the year selected). 
-  </div>
-  <div class="action-link">
-    <a class="button new-option" href="{$add_url}">
-      <span><div class="icon add-icon"></div>Ny Skatteinnberetninger</span>
-    </a>
   </div>
   <div id="skatteinnberetninger_wrapper" class="dataTables_wrapper">
     <table id="skatteinnberetninger-table" class="display">
@@ -40,9 +35,5 @@
       </tbody>
     </table>    
   </div>
-  <div class="action-link">
-    <a class="button new-option" href="{$add_url}">
-      <span><div class="icon add-icon"></div>Ny Skatteinnberetninger</span>
-    </a>
   </div>
 </div>

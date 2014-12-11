@@ -6,17 +6,17 @@
 return array (
   0 => 
   array (
-    'name' => 'Cron:TaxDeclarationYear.Load',
+    'name' => 'Cron:TaxDeclarationYear.Export',
     'entity' => 'Job',
     'params' => 
     array (
       'version' => 3,
-      'name' => 'Skatteinnberetninger Load',
-      'description' => 'Load or add donor data from contributions into Skatteinnberetninger year',
+      'name' => 'Skatteinnberetninger Export',
+      'description' => 'Create XML file for Skatteinberetninger',
       'run_frequency' => 'Daily',
       'api_entity' => 'TaxDeclarationYear',
-      'api_action' => 'Load',
-      'parameters' => 'year = [2013, year to be reported on] required / reload = [0 first load for year or 1 add contacts to existing year] required',
+      'api_action' => 'Export',
+      'parameters' => 'year = [2013, year to be exported] required',
       'is_active' => 0
     ),
   ),

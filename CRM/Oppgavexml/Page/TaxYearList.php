@@ -28,56 +28,14 @@ class CRM_Oppgavexml_Page_TaxYearList extends CRM_Core_Page {
   protected function set_row_actions($tax_year, $status_id) {
     $page_actions = array();
     $status_label = CRM_OppgaveXml_OptionGroup::get_status_option_label($status_id);
-    switch ($status_label) {
-      case 'New':
-        $this->set_new_row_actions($tax_year, $page_actions);
-        break;
-      case 'Loaded':
-        $this->set_loaded_modified_row_actions($tax_year, $page_actions);
-        break;
-      case 'Modified':
-        $this->set_loaded_modified_row_actions($tax_year, $page_actions);
-        break;
-      case 'Exported':
-        $this->set_exported_row_actions($tax_year, $page_actions);
-        break;
+    $manage_url = CRM_Utils_System::url('civicrm/oppgavelist', 'year='.$tax_year);
+    $delete_url = CRM_Utils_System::url('civicrm/skatteinnberetninger', 'action=delete&year='.$tax_year, true);
+    if ($status_label == ' New') {
+      $page_actions[] = '<a class="action-item" title="Delete" href="'.$delete_url.'">Delete</a>';      
+    } else {
+      $page_actions[] = '<a class="action-item" title="Manage" href="'.$manage_url.'">Manage</a>';
     }
     return $page_actions;
-  }
-  /**
-   * Function to set the actions for a tax year with status Exported
-   * 
-   * @access protected
-   */
-  protected function set_exported_row_actions($tax_year, &$page_actions) {
-    $manage_url = CRM_Utils_System::url('civicrm/oppgavelist', 'year='.$tax_year);
-    $page_actions[] = '<a class="action-item" title="Manage" href="'.$manage_url.'">Manage</a>';
-    $reload_url = CRM_Utils_System::url('civicrm/loadtaxyear', 'option=reload&year='.$tax_year, true);
-    $page_actions[] = '<a class="action-item" title="Reload" href="'.$reload_url.'">Reload</a>';
-  }
-  /**
-   * Function to set the actions for a tax year with status Loaded or Modified
-   * 
-   * @access protected
-   */
-  protected function set_loaded_modified_row_actions($tax_year, &$page_actions) {
-    $manage_url = CRM_Utils_System::url('civicrm/oppgavelist', 'year='.$tax_year);
-    $page_actions[] = '<a class="action-item" title="Manage" href="'.$manage_url.'">Manage</a>';
-    $reload_url = CRM_Utils_System::url('civicrm/loadtaxyear', 'option=reload&year='.$tax_year, true);
-    $page_actions[] = '<a class="action-item" title="Reload" href="'.$reload_url.'">Reload</a>';
-    $export_rul = CRM_Utils_System::url('civicrm/exporttaxyear', 'year='.$tax_year, true);
-    $page_actions[] = '<a class="action-item" title="Export" href="'.$export_rul.'">Export</a>';
-  }
-  /**
-   * Function to set the actions for a tax year with status New
-   * 
-   * @access protected
-   */
-  protected function set_new_row_actions($tax_year, &$page_actions) {
-    $load_url = CRM_Utils_System::url('civicrm/loadtaxyear');
-    $page_actions[] = '<a class="action-item" title="Load" href="'.$load_url.'">Load</a>';
-    $delete_url = CRM_Utils_System::url('civicrm/skatteinnberetninger', 'action=delete&year='.$tax_year, true);
-    $page_actions[] = '<a class="action-item" title="Delete" href="'.$delete_url.'">Delete</a>';
   }
   /**
    * Function to set the page configuration initially
@@ -85,8 +43,7 @@ class CRM_Oppgavexml_Page_TaxYearList extends CRM_Core_Page {
    * @access protected
    */
   protected function set_page_configuration() {
-    CRM_Utils_System::setTitle(ts('Manage Tax Declaration Years'));    
-    $this->assign('add_url', CRM_Utils_System::url('civicrm/skatteinnberetninger', 'action=add', true));
+    CRM_Utils_System::setTitle(ts('Manage Tax Declaration Years'));
   }
   /**
    * Function to get skatteinnberetninger
