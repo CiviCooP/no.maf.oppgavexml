@@ -106,6 +106,7 @@ class CRM_Oppgavexml_Page_OppgaveList extends CRM_Core_Page {
       $this->_display_context = 'year';
       $this->_context_tax_year = CRM_Utils_Request::retrieve('year', 'Positive');
     }
+    $this->assign('display_type', $this->_display_context);
     $this->assign('add_url', CRM_Utils_System::url('civicrm/oppgave', 'action=add&cid='.$this->_context_contact_id.'&year='.$this->_context_tax_year, true));  
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/oppgavelist', 'year='.$this->_context_tax_year));
