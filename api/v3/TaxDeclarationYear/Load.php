@@ -26,6 +26,8 @@ function civicrm_api3_tax_declaration_year_load($params) {
   remove_year_records($params);
   $dao = get_relevant_contacts($params['year']);
   while ($dao->fetch()) {
+    CRM_Core_Error::debug('dao', $dao);
+    exit();
     create_contact_oppgave($params, $dao);
   }
   create_skatteinnberetninger($params);  
