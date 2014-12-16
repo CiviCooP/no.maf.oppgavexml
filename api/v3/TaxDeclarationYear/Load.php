@@ -26,8 +26,6 @@ function civicrm_api3_tax_declaration_year_load($params) {
   remove_year_records($params);
   $dao = get_relevant_contacts($params['year']);
   while ($dao->fetch()) {
-    CRM_Core_Error::debug('dao', $dao);
-    exit();
     create_contact_oppgave($params, $dao);
   }
   create_skatteinnberetninger($params);  
@@ -82,6 +80,9 @@ function create_contact_oppgave($params, $dao) {
   }
   if ($create_contact == TRUE) {
     $create_params = set_oppgave_params($params['year'], $dao);
+    CRM_Core_Error::debug('params', $create_params);
+    CRM_Core_Error::debug('dao', $dao);
+    exit();
     if (!empty($create_params)) {
       $query = 'INSERT INTO civicrm_oppgave (oppgave_year, contact_id, donor_type, '
         . 'donor_name, donor_number, deductible_amount, loaded_date) '
@@ -124,6 +125,8 @@ function set_oppgave_params($year, $dao) {
   $oppgave_config = CRM_Oppgavexml_Config::singleton();
   $min_amount = $oppgave_config->get_min_deductible_amount();
   $max_amount = $oppgave_config->get_max_deductible_amount();
+  CRM_Core_Error::debug('min', $min_amount);
+  CRM_Core_Error::debug('max', $max_amount);
   if ($dao->deductible_amount >= $min_amount) {
     if ($dao->deductible_amount > $max_amount) {
       $dao->deductible_amount = $max_amount;
@@ -151,6 +154,8 @@ function get_donor_data($contact_id) {
   $oppgave_config = CRM_Oppgavexml_Config::singleton();
   $personsnummer_id = 'custom_'.$oppgave_config->get_personsnummer_custom_field_id();
   $organisasjonsnummer_id = 'custom_'.$oppgave_config->get_organisasjonsnummer_custom_field_id();
+  CRM_Core_Error::debug('person', $personsnummer_id);
+  CRM_Core_Error::debug('orga', $organisasjonsnummer_id);
   $params = array(
     'id' => $contact_id,
     'return' => array('contact_type', 'display_name', $personsnummer_id, $organisasjonsnummer_id));
