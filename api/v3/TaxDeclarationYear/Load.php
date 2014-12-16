@@ -80,8 +80,6 @@ function create_contact_oppgave($params, $dao) {
   }
   if ($create_contact == TRUE) {
     $create_params = set_oppgave_params($params['year'], $dao);
-    CRM_Core_Error::debug('params', $create_params);
-    CRM_Core_Error::debug('dao', $dao);
     if ($dao->contact_id != 2) {
       exit();
     }
@@ -163,6 +161,10 @@ function get_donor_data($contact_id) {
     'return' => array('contact_type', 'display_name', $personsnummer_id, $organisasjonsnummer_id));
   try {
     $contact_data = civicrm_api3('Contact', 'Getsingle', $params);
+    if ($contact_id != 2) {
+      CRM_Core_Error::debug('contact_data', $contact_data);
+      exit();
+    }
     $donor_data = pull_donor_data($contact_data, $personsnummer_id, $organisasjonsnummer_id);
     if (empty($donor_data['number'])) {
       $donor_data = array();
