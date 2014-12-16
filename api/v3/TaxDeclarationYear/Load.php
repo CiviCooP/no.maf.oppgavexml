@@ -154,14 +154,13 @@ function get_donor_data($contact_id) {
   $oppgave_config = CRM_Oppgavexml_Config::singleton();
   $personsnummer_id = 'custom_'.$oppgave_config->get_personsnummer_custom_field_id();
   $organisasjonsnummer_id = 'custom_'.$oppgave_config->get_organisasjonsnummer_custom_field_id();
-  CRM_Core_Error::debug('person', $personsnummer_id);
-  CRM_Core_Error::debug('orga', $organisasjonsnummer_id);
   $params = array(
     'id' => $contact_id,
     'return' => array('contact_type', 'display_name', $personsnummer_id, $organisasjonsnummer_id));
   try {
     $contact_data = civicrm_api3('Contact', 'Getsingle', $params);
     if ($contact_id != 2) {
+      CRM_Core_Error::debug('params', $params);
       CRM_Core_Error::debug('contact_data', $contact_data);
       exit();
     }
