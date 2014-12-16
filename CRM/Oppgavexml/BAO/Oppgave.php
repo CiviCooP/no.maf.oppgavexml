@@ -60,4 +60,19 @@ class CRM_Oppgavexml_BAO_Oppgave extends CRM_Oppgavexml_DAO_Oppgave {
     self::storeValues($oppgave, $result);
     return $result;
   }
+  /**
+   * Function to delete a donor oppgave record by id
+   * 
+   * @param int $oppgave_id
+   * @throws Exception when oppgave_id is empty
+   */
+  public static function delete_by_id($oppgave_id) {
+    if (empty($oppgave_id)) {
+      throw new Exception('oppgave_id can not be empty when attempting to delete a donor oppgave');
+    }
+    $oppgave = new CRM_Oppgavexml_BAO_Oppgave();
+    $oppgave->id = $oppgave_id;
+    $oppgave->delete();
+    return;
+  }
 }

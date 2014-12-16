@@ -77,7 +77,7 @@ class CRM_Oppgavexml_DAO_Oppgave extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
         ),
         'last_exported_date' => array(
-          'name' => 'lasst_exported_date',
+          'name' => 'last_exported_date',
           'type' => CRM_Utils_Type::T_DATE,
         ),
       );

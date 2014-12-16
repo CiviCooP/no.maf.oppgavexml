@@ -7,6 +7,9 @@
  * @param array $spec description of fields supported by this API call
  * @return void
  * @see http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+ * 
+ * Copyright (C) 2014 Coöperatieve CiviCooP U.A. <http://www.civicoop.org>
+ * Licensed to MAF Norge <http://www.maf.no> under the  AGPL-3.0
  */
 function _civicrm_api3_tax_declaration_year_export_spec(&$spec) {
   $spec['year']['api.required'] = 1;

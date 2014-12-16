@@ -39,23 +39,36 @@ class CRM_Oppgavexml_Page_OppgaveList extends CRM_Core_Page {
     }
     $oppgaves = CRM_Oppgavexml_BAO_Oppgave::get_values($params);
     foreach ($oppgaves as $oppgave_id => $oppgave) {
-      $oppgaves[$oppgave_id]['actions'] = $this->set_row_actions($oppgave_id);
+      $oppgaves[$oppgave_id]['actions'] = $this->set_row_actions($oppgave);
+      if (!empty($oppgave['last_modified_user_id'])) {
+        $oppgaves[$oppgave_id]['last_modified_user'] = $this->get_contact_name($oppgave['last_modified_user_id']);
+      }
     }
     return $oppgaves;
+  }
+  protected function get_contact_name($contact_id) {
+    $params = array(
+      'id' => $contact_id,
+      'return' => 'display_name'
+    );
+    $name = civicrm_api3('Contact', 'Getvalue', $params);
+    return $name;
   }
   /**
    * Function to set the row action urls and links for each row
    * 
-   * @param int $oppgave_id
+   * @param int $oppgave
    * @return array $page_actions
    * @access protected
    */
-  protected function set_row_actions($oppgave_id) {
+  protected function set_row_actions($oppgave) {
     $page_actions = array();
-    $view_url = CRM_Utils_System::url('civicrm/oppgave', 'action=view&oid='.$oppgave_id);
-    $page_actions[] = '<a class="action-item" title="View" href="'.$view_url.'">View</a>';
-    $edit_url = CRM_Utils_System::url('civicrm/oppgave', 'action=edit&oid='.$oppgave_id);
+    $edit_url = CRM_Utils_System::url('civicrm/oppgave', 'action=update&oid='.
+      $oppgave['id'].'&year='.$oppgave['oppgave_year']);
     $page_actions[] = '<a class="action-item" title="Edit" href="'.$edit_url.'">Edit</a>';
+    $delete_url = CRM_Utils_System::url('civicrm/oppgave', 'action=delete&oid='.
+      $oppgave['id'].'&year='.$oppgave['oppgave_year']);
+    $page_actions[] = '<a class="action-item" title="Delete" href="'.$delete_url.'">Delete</a>';
     return $page_actions;
   }
   /**
@@ -85,7 +98,6 @@ class CRM_Oppgavexml_Page_OppgaveList extends CRM_Core_Page {
    */
   protected function set_page_configuration() {
     CRM_Utils_System::setTitle(ts('Donoroppgave'));    
-    $this->assign('add_url', CRM_Utils_System::url('civicrm/oppgave', 'action=add&cid='.$this->_context_contact_id, true));  
     $snippet = CRM_Utils_Request::retrieve('snippet', 'Positive');
     if (!empty($snippet)) {
       $this->_display_context = 'contact';
@@ -94,5 +106,8 @@ class CRM_Oppgavexml_Page_OppgaveList extends CRM_Core_Page {
       $this->_display_context = 'year';
       $this->_context_tax_year = CRM_Utils_Request::retrieve('year', 'Positive');
     }
+    $this->assign('add_url', CRM_Utils_System::url('civicrm/oppgave', 'action=add&cid='.$this->_context_contact_id.'&year='.$this->_context_tax_year, true));  
+    $session = CRM_Core_Session::singleton();
+    $session->pushUserContext(CRM_Utils_System::url('civicrm/oppgavelist', 'year='.$this->_context_tax_year));
   }
 }

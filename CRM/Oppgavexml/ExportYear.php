@@ -4,6 +4,9 @@
  * as far as the default Case Relations are concerned for PUM
  *
  * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+ * 
+ * Copyright (C) 2014 Coöperatieve CiviCooP U.A. <http://www.civicoop.org>
+ * Licensed to MAF Norge <http://www.maf.no> under the  AGPL-3.0
  */
 class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
   protected $_tax_year = null;
@@ -35,6 +38,7 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
     $this->add_footer($leveranse);
     $this->set_file_name();
     $this->_xml->asXML($this->_xml_file_name);
+    $this->set_exported_date();
   }
   protected function set_file_name() {
     $this->_xml_file_name = $this->_xml_file_path.'skatteinnberetninger_'.$this->_tax_year.'.xml';
@@ -167,5 +171,14 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
     $leveranse->addChild('kildesystem', $this->_sender_kilde_system);
     $this->_xml_object->addChild('oppgavegiver');
     $this->_xml_object->addChild();
+  }
+  protected function set_exported_date() {
+    $export_date = date('Ymd');
+    $query = 'UPDATE civicrm_oppgave SET last_exported_date = %1 WHERE oppgave_year = %2';
+    $params = array(
+      1 => array($export_date, 'Date'),
+      2 => array($this->_tax_year, 'Positive')
+    );
+    CRM_Core_DAO::executeQuery($query, $params);
   }
 }

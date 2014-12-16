@@ -28,7 +28,7 @@ function civicrm_api3_tax_declaration_year_load($params) {
   while ($dao->fetch()) {
     create_contact_oppgave($params, $dao);
   }
-  update_skatteinnberetninger_status($params['year']);
+  create_skatteinnberetninger($params);  
   return civicrm_api3_create_success($return_values, $params, 'TaxDeclarationYear', 'Load');
 }
 /**
@@ -193,14 +193,18 @@ function pull_donor_data($contact_data, $personsnummer_id, $organisasjonsnummer_
 /**
  * Function to update the status of the tax declaration year
  * 
- * @param int $tax_year
+ * @param array $params
  */
-function update_skatteinnberetninger_status($tax_year) {
-  $query = 'UPDATE civicrm_skatteinnberetninger SET status_id = %1 WHERE year = %2';
-  $params = array(
-    1 => array(2, 'Positive'),
-    2 => array($tax_year, 'Positive'));
-  CRM_Core_DAO::executeQuery($query, $params);
+function create_skatteinnberetninger($params) {
+  if ($params['reload'] == 0) {
+    $query = 'REPLACE INTO civicrm_skatteinnberetninger (year, status_id) VALUES(%1, %2)';
+  } else {
+    $query = 'UPDATE civicrm_skatteinnberetninger SET status_id = %2 WHERE year = %1';
+  }
+  $query_params = array(
+    1 => array($params['year'], 'Positive'),
+    2 => array(2, 'Positive'));
+  CRM_Core_DAO::executeQuery($query, $query_params);
 }
 /**
  * Function to validate incoming params
