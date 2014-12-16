@@ -29,9 +29,9 @@ class CRM_Oppgavexml_Config {
   /*
    * property for custom group and custom fields for personsnummer and organisasjonsnummer
    */
-  protected $_contact_custom_group_id = null;
-  protected $_personsnummer_custom_field_id = null;
-  protected $_organisasjonsnummer_custom_field_id = null;
+  protected $_contact_custom_group_table = null;
+  protected $_personsnummer_custom_field_column = null;
+  protected $_organisasjonsnummer_custom_field_column = null;
   /*
    * properties to hold the information about the sending organisation
    * and the file type
@@ -65,31 +65,31 @@ class CRM_Oppgavexml_Config {
     $this->set_custom_data();
   }
   /**
-   * Function to return the custom group id for the maf_norway_import custom group
+   * Function to return the custom group table name for the maf_norway_import custom group
    * 
    * @return int
    * @access public
    */
-  public function get_contact_custom_group_id() {
-    return $this->_contact_custom_group_id;
+  public function get_contact_custom_group_table() {
+    return $this->_contact_custom_group_table;
   }
   /**
-   * Function to return the custom field id for personsnummer
+   * Function to return the custom field column for personsnummer
    * 
    * @return int
    * @access public
    */
-  public function get_personsnummer_custom_field_id() {
-    return $this->_personsnummer_custom_field_id;
+  public function get_personsnummer_custom_field_column() {
+    return $this->_personsnummer_custom_field_column;
   }
   /**
-   * Function to return the custom field id for organisasjonsnummer
+   * Function to return the custom field column for organisasjonsnummer
    * 
    * @return int
    * @access public
    */
-  public function get_organisasjonsnummer_custom_field_id() {
-    return $this->_organisasjonsnummer_custom_field_id;
+  public function get_organisasjonsnummer_custom_field_column() {
+    return $this->_organisasjonsnummer_custom_field_column;
   }
   /**
    * Function to return the sender kilde system
@@ -325,23 +325,22 @@ class CRM_Oppgavexml_Config {
    * @access protected
    */
   protected function set_custom_data() {
-    $custom_group_params = array(
-      'name' => 'maf_norway_import',
-      'return' => 'id');
+    $custom_group_params = array('name' => 'maf_norway_import');
     try {
-      $this->_contact_custom_group_id = civicrm_api3('CustomGroup', 'Getvalue', $custom_group_params);
+      $custom_group = civicrm_api3('CustomGroup', 'Getsingle', $custom_group_params);
+      $this->_contact_custom_group_table = $custom_group['table_name'];
     } catch (CiviCRM_API3_Exception $ex) {
       throw new Exception('Could not find custom group with name maf_norway_import, '
-        . 'error from API CustomGroup Getvalue: '.$ex->getMessage());
+        . 'error from API CustomGroup Getsingle: '.$ex->getMessage());
     }
     $custom_fields = civicrm_api3('CustomField', 'Get', 
-      array('custom_group_id' => $this->_contact_custom_group_id));
+      array('custom_group_id' => $custom_group['id']));
     foreach ($custom_fields['values'] as $custom_field) {
       if ($custom_field['name'] == 'personsnummer') {
-        $this->_personsnummer_custom_field_id = $custom_field['id'];
+        $this->_personsnummer_custom_field_column = $custom_field['column_name'];
       }
       if ($custom_field['name'] == 'organisasjonsnummer') {
-        $this->_organisasjonsnummer_custom_field_id = $custom_field['id'];
+        $this->_organisasjonsnummer_custom_field_column = $custom_field['column_name'];
       }
     }
   }

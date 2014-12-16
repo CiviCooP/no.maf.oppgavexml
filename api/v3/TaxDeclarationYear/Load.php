@@ -80,9 +80,6 @@ function create_contact_oppgave($params, $dao) {
   }
   if ($create_contact == TRUE) {
     $create_params = set_oppgave_params($params['year'], $dao);
-    if ($dao->contact_id != 2) {
-      exit();
-    }
     if (!empty($create_params)) {
       $query = 'INSERT INTO civicrm_oppgave (oppgave_year, contact_id, donor_type, '
         . 'donor_name, donor_number, deductible_amount, loaded_date) '
@@ -125,8 +122,6 @@ function set_oppgave_params($year, $dao) {
   $oppgave_config = CRM_Oppgavexml_Config::singleton();
   $min_amount = $oppgave_config->get_min_deductible_amount();
   $max_amount = $oppgave_config->get_max_deductible_amount();
-  CRM_Core_Error::debug('min', $min_amount);
-  CRM_Core_Error::debug('max', $max_amount);
   if ($dao->deductible_amount >= $min_amount) {
     if ($dao->deductible_amount > $max_amount) {
       $dao->deductible_amount = $max_amount;
@@ -151,20 +146,11 @@ function set_oppgave_params($year, $dao) {
  * @return array $donor_data
  */
 function get_donor_data($contact_id) {
-  $oppgave_config = CRM_Oppgavexml_Config::singleton();
-  $personsnummer_id = 'custom_'.$oppgave_config->get_personsnummer_custom_field_id();
-  $organisasjonsnummer_id = 'custom_'.$oppgave_config->get_organisasjonsnummer_custom_field_id();
-  $params = array(
-    'id' => $contact_id,
-    'return' => array('contact_type', 'display_name', $personsnummer_id, $organisasjonsnummer_id));
+  $params = array('id' => $contact_id);
   try {
     $contact_data = civicrm_api3('Contact', 'Getsingle', $params);
-    if ($contact_id != 2) {
-      CRM_Core_Error::debug('params', $params);
-      CRM_Core_Error::debug('contact_data', $contact_data);
-      exit();
-    }
-    $donor_data = pull_donor_data($contact_data, $personsnummer_id, $organisasjonsnummer_id);
+    $donor_data = pull_donor_data($contact_data);
+    
     if (empty($donor_data['number'])) {
       $donor_data = array();
     }
@@ -177,28 +163,50 @@ function get_donor_data($contact_id) {
  * Function to pull donor data from api contact getsingle result array
  * 
  * @param array $contact_data
- * @param string $personsnummer_id
- * @param string $organisasjonsnummer_id
  * @return array $donor_data
  */
-function pull_donor_data($contact_data, $personsnummer_id, $organisasjonsnummer_id) {
+function pull_donor_data($contact_data) {
   $donor_data = array();
   $donor_data['name'] = $contact_data['display_name'];
+  $custom_data = get_custom_data($contact_data['id']);
   switch ($contact_data['contact_type']) {
     case 'Individual':
       $donor_data['type'] = 'Person';
-      $donor_data['number'] = $contact_data[$personsnummer_id];
+      $donor_data['number'] = $custom_data['personsnummer'];
       break;
     case 'Household':
       $donor_data['type'] = 'Husholdning';
-      $donor_data['number'] = $contact_data[$personsnummer_id];
+      $donor_data['number'] = $custom_data['personsnummer'];
     break;
     case 'Organization':
       $donor_data['type'] = 'Organisasjon';
-      $donor_data['number'] = $contact_data[$organisasjonsnummer_id];
+      $donor_data['number'] = $custom_data['organisasjonsnummer'];
     break;
   }
   return $donor_data;
+}
+/**
+ * Function to get custom data for person/organisasjonsnummer
+ * 
+ * @param int $contact_id
+ * @return array $custom_data
+ */
+function get_custom_data($contact_id) {
+  $oppgave_config = CRM_Oppgavexml_Config::singleton();
+  $table_name = $oppgave_config->get_contact_custom_group_table();
+  $column_person = $oppgave_config->get_personsnummer_custom_field_column();
+  $column_org = $oppgave_config->get_organisasjonsnummer_custom_field_column();
+  $query = ' SELECT * FROM '.$table_name.' WHERE entity_id = %1';
+  $params = array(1 => array($contact_id, 'Positive'));
+  $dao = CRM_Core_DAO::executeQuery($query, $params);
+  if ($dao->fetch()) {
+    $custom_data['personsnummer'] = $dao->$column_person;
+    $custom_data['organisasjonsnummer'] = $dao->$column_org;
+  } else {
+    $custom_data['personsnummer'] = '';
+    $custom_data['organisasjonsnummer'] = '';    
+  }
+  return $custom_data;
 }
 /**
  * Function to update the status of the tax declaration year
