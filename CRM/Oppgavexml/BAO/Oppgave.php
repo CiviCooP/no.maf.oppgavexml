@@ -75,4 +75,15 @@ class CRM_Oppgavexml_BAO_Oppgave extends CRM_Oppgavexml_DAO_Oppgave {
     $oppgave->delete();
     return;
   }
+  /**
+   * Function to count the number of records for contact_id
+   * 
+   * @param int $contact_id
+   * @return int
+   */
+  public static function get_contact_count($contact_id) {
+    $oppgave = new CRM_Oppgavexml_BAO_Oppgave();
+    $oppgave->contact_id = $contact_id;
+    return $oppgave->count();
+  }
 }

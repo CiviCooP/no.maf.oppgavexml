@@ -78,7 +78,7 @@ class CRM_Oppgavexml_Page_OppgaveList extends CRM_Core_Page {
    * @access protected
    */
   protected function set_contact_params() {
-    $params = array('year' => $this->_context_contact_id);
+    $params = array('contact_id' => $this->_context_contact_id);
     return $params;
   }
   /**

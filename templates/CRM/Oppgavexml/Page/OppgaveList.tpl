@@ -1,12 +1,14 @@
 <div class="crm-content-block crm-block">
-  <div id="help">
-    The existing donor oppgave are listed below. You can edit, delete or add a new one from this screen. 
-  </div>
-  <div class="action-link">
-    <a class="button new-option" href="{$add_url}">
-      <span><div class="icon add-icon"></div>Ny Donoroppgave</span>
-    </a>
-  </div>
+  {if $display_type eq 'year'}
+    <div id="help">
+      The existing donor oppgave are listed below. You can edit, delete or add a new one from this screen. 
+    </div>
+    <div class="action-link">
+      <a class="button new-option" href="{$add_url}">
+        <span><div class="icon add-icon"></div>Ny Donoroppgave</span>
+      </a>
+    </div>
+  {/if}
   <div id="oppgave_wrapper" class="dataTables_wrapper">
     <table id="oppgave-table" class="display">
       <thead>
@@ -63,9 +65,11 @@
       </tbody>
     </table>    
   </div>
-  <div class="action-link">
-    <a class="button new-option" href="{$add_url}">
-      <span><div class="icon add-icon"></div>Ny Donoroppgave</span>
-    </a>
-  </div>
+  {if $display_type eq 'year'}
+    <div class="action-link">
+      <a class="button new-option" href="{$add_url}">
+        <span><div class="icon add-icon"></div>Ny Donoroppgave</span>
+      </a>
+    </div>
+  {/if}
 </div>

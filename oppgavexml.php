@@ -115,8 +115,23 @@ function oppgavexml_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 function oppgavexml_civicrm_navigationMenu( &$params ) {
   $tax_year_list = array (
     'name'          =>  ts('Skatteinnberetninger'),
-    'url'           =>  CRM_Utils_System::url('civicrm/taxyearlist'),
+    'url'           =>  CRM_Utils_System::url('civicrm/taxyearlist', '', true),
     'permission'    => 'administer CiviCRM',
   );
   _oppgavexml_civix_insert_navigation_menu($params, 'Contributions', $tax_year_list);
+}
+/**
+ * Implementation of hook civicrm_tabs to add a tab for Arsoppgave
+ * 
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_tabs
+ */
+function oppgavexml_civicrm_tabs(&$tabs, $contact_id) {
+  $oppgave_count = CRM_Oppgavexml_BAO_Oppgave::get_contact_count($contact_id);
+  $oppgave_url = CRM_Utils_System::url('civicrm/oppgavelist','snippet=1&cid='.$contact_id);
+  $tabs[] = array( 
+    'id'    => 'contact_oppgave',
+    'url'       => $oppgave_url,
+    'title'     => 'Årsoppgave',
+    'weight'    => 99,
+    'count'     => $oppgave_count);
 }
