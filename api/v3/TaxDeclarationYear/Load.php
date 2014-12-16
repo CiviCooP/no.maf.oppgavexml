@@ -82,7 +82,9 @@ function create_contact_oppgave($params, $dao) {
     $create_params = set_oppgave_params($params['year'], $dao);
     CRM_Core_Error::debug('params', $create_params);
     CRM_Core_Error::debug('dao', $dao);
-    exit();
+    if ($dao->contact_id != 2) {
+      exit();
+    }
     if (!empty($create_params)) {
       $query = 'INSERT INTO civicrm_oppgave (oppgave_year, contact_id, donor_type, '
         . 'donor_name, donor_number, deductible_amount, loaded_date) '
