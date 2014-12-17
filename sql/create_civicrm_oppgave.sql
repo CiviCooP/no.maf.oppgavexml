@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_oppgave` (
   `donor_type` VARCHAR(45) NULL,
   `donor_name` VARCHAR(128) NULL,
   `donor_number` VARCHAR(45) NULL,
-  `deductible_amount` DECIMAL(9,2) NULL,
+  `deductible_amount` INT(11) NULL,
   `loaded_date` DATE NULL,
   `last_modified_date` DATE NULL,
   `last_modified_user_id` INT NULL,

@@ -62,7 +62,7 @@ class CRM_Oppgavexml_DAO_Oppgave extends CRM_Core_DAO {
         ),
         'deductible_amount' => array(
           'name' => 'deductible_amount',
-          'type' => CRM_Utils_Type::T_MONEY,
+          'type' => CRM_Utils_Type::T_INT,
         ),
         'loaded_date' => array(
           'name' => 'loaded_date',

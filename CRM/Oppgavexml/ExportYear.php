@@ -34,7 +34,7 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
     $leveranse->addChild('inntektsaar', $this->_tax_year);
     $leveranse->addChild('oppgavegiversLeveranseReferanse', $this->_sender_leveranse_referanse);
     $leveranse->addChild('leveransetype', $this->_leveranse_type);
-    $this->add_donor_lines($leveranse);
+    $this->add_test_donor_lines($leveranse);
     $this->add_footer($leveranse);
     $this->set_file_name();
     $this->_xml->asXML($this->_xml_file_name);
@@ -98,8 +98,8 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
   protected function add_test_donor_lines(&$leveranse) {
     $oppgave1 = $leveranse->addChild('oppgave');
     $donor1 = $oppgave1->addChild('oppgaveeier');
-    $donor1->addChild('foedselsnummer', '01010150317');
-    $donor1->addChild('navn', 'KÅRE JØRGENSEN');
+    $donor1->addChild('foedselsnummer', '12112300501');
+    $donor1->addChild('navn', 'JOSTEIN KARLSEN');
     $oppgave1->addChild('beloep', 550);
     $this->_total_count++;
     $this->_total_sum = $this->_total_sum + 550;
@@ -135,6 +135,86 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
     $oppgave5->addChild('beloep', 750);
     $this->_total_count++;
     $this->_total_sum = $this->_total_sum + 750;
+    
+    $oppgave6 = $leveranse->addChild('oppgave');
+    $donor6 = $oppgave6->addChild('oppgaveeier');
+    $donor6->addChild('foedselsnummer', '12112600130');
+    $donor6->addChild('navn', 'DAG ISSE');
+    $oppgave6->addChild('beloep', 1250);
+    $this->_total_count++;
+    $this->_total_sum = $this->_total_sum + 1250;
+    
+    $oppgave7 = $leveranse->addChild('oppgave');
+    $donor7 = $oppgave7->addChild('oppgaveeier');
+    $donor7->addChild('foedselsnummer', '12115100392');
+    $donor7->addChild('navn', 'IDAR FINNØY');
+    $oppgave7->addChild('beloep', 11321);
+    $this->_total_count++;
+    $this->_total_sum = $this->_total_sum + 11321;
+    
+    $oppgave8 = $leveranse->addChild('oppgave');
+    $donor8 = $oppgave8->addChild('oppgaveeier');
+    $donor8->addChild('organisasjonsnummer', '910168754');
+    $donor8->addChild('navn', 'ÅLVUNDEID OG BRIMSE');
+    $oppgave8->addChild('beloep', 16800);
+    $this->_total_count++;
+    $this->_total_sum = $this->_total_sum + 16800;
+    
+    $oppgave9 = $leveranse->addChild('oppgave');
+    $donor9 = $oppgave9->addChild('oppgaveeier');
+    $donor9->addChild('foedselsnummer', '12115100473');
+    $donor9->addChild('navn', 'INGER SEKUND');
+    $oppgave9->addChild('beloep', 2400);
+    $this->_total_count++;
+    $this->_total_sum = $this->_total_sum + 2400;
+    
+    $oppgave10 = $leveranse->addChild('oppgave');
+    $donor10 = $oppgave10->addChild('oppgaveeier');
+    $donor10->addChild('foedselsnummer', '12115100554');
+    $donor10->addChild('navn', 'OLE MARTIN JANSSON');
+    $oppgave10->addChild('beloep', 4800);
+    $this->_total_count++;
+    $this->_total_sum = $this->_total_sum + 4800;
+    
+    $oppgave11 = $leveranse->addChild('oppgave');
+    $donor11 = $oppgave11->addChild('oppgaveeier');
+    $donor11->addChild('foedselsnummer', '12119000465');
+    $donor11->addChild('navn', 'MALIN BOGEN');
+    $oppgave11->addChild('beloep', 1200);
+    $this->_total_count++;
+    $this->_total_sum = $this->_total_sum + 1200;
+    
+    $oppgave12 = $leveranse->addChild('oppgave');
+    $donor12 = $oppgave12->addChild('oppgaveeier');
+    $donor12->addChild('foedselsnummer', '12122700222');
+    $donor12->addChild('navn', 'MARI ARNESEN');
+    $oppgave12->addChild('beloep', 600);
+    $this->_total_count++;
+    $this->_total_sum = $this->_total_sum + 600;
+    
+    $oppgave13 = $leveranse->addChild('oppgave');
+    $donor13 = $oppgave13->addChild('oppgaveeier');
+    $donor13->addChild('foedselsnummer', '12125600296');
+    $donor13->addChild('navn', 'BRITT ELTVIK');
+    $oppgave13->addChild('beloep', 900);
+    $this->_total_count++;
+    $this->_total_sum = $this->_total_sum + 900;
+    
+    $oppgave14 = $leveranse->addChild('oppgave');
+    $donor14 = $oppgave14->addChild('oppgaveeier');
+    $donor14->addChild('organisasjonsnummer', '910168851');
+    $donor14->addChild('navn', 'SKJOLDASTRAUMEN OG SNILSTVEITØY');
+    $oppgave14->addChild('beloep', 9000);
+    $this->_total_count++;
+    $this->_total_sum = $this->_total_sum + 9000;
+    
+    $oppgave15 = $leveranse->addChild('oppgave');
+    $donor15 = $oppgave15->addChild('oppgaveeier');
+    $donor15->addChild('foedselsnummer', '12125900249');
+    $donor15->addChild('navn', 'JENNY EIKE');
+    $oppgave15->addChild('beloep', 1500);
+    $this->_total_count++;
+    $this->_total_sum = $this->_total_sum + 1500;
     }
   /**
    * Function to add the oppgavegiver details to the xml
@@ -144,8 +224,10 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
    */
   protected function add_oppgavegiver(&$leveranse) {
     $oppgavegiver = $leveranse->addChild('oppgavegiver');
-    $oppgavegiver->addChild('organisasjonsnummer', $this->_sender_organisasjonsnummer);
-    $oppgavegiver->addChild('organisasjonsnavn', $this->_sender_organisasjonsnavn);
+    $oppgavegiver->addChild('organisasjonsnummer', '910069772');
+    //$oppgavegiver->addChild('organisasjonsnummer', $this->_sender_organisasjonsnummer);
+    $oppgavegiver->addChild('organisasjonsnavn', 'NANNESTAD OG HEMSEDAL');
+    //$oppgavegiver->addChild('organisasjonsnavn', $this->_sender_organisasjonsnavn);
     $kontakt = $oppgavegiver->addChild('kontaktinformasjon');
     $kontakt->addChild('navn', $this->_sender_kontakt_navn);
     $kontakt->addChild('telefonnummer', $this->_sender_kontakt_telefon);
