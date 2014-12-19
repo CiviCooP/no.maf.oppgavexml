@@ -41,6 +41,10 @@ class CRM_Oppgavexml_DAO_Skatteinnberetninger extends CRM_Core_DAO {
           'name' => 'status_id',
           'type' => CRM_Utils_Type::T_INT,
         ) ,
+        'last_referanse' => array(
+          'name' => 'last_referanse',
+          'type' => CRM_Utils_Type::T_STRING,
+        )
       );
     }
     return self::$_fields;
@@ -57,6 +61,7 @@ class CRM_Oppgavexml_DAO_Skatteinnberetninger extends CRM_Core_DAO {
       self::$_fieldKeys = array(
         'year' => 'year', 
         'status_id' => 'status_id',
+        'last_referanse' => 'last_referanse'
       );
     }
     return self::$_fieldKeys;

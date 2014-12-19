@@ -60,4 +60,31 @@ class CRM_Oppgavexml_BAO_Skatteinnberetninger extends CRM_Oppgavexml_DAO_Skattei
     self::storeValues($skatteinnberetninger, $result);
     return $result;
   }
+  /**
+   * Function to get and save the last referanse for the year
+   * 
+   * @param int $year
+   * @return string $referanse
+   * @access public
+   * @static
+   */
+  public static function get_new_referanse($year) {
+    $referanse = '';
+    $skatteinnberetninger = new CRM_Oppgavexml_BAO_Skatteinnberetninger();
+    $skatteinnberetninger->year = $year;
+    if ($skatteinnberetninger->find(true)) {
+      $skatteinnberetninger->last_referanse++;
+      $last_referanse = $skatteinnberetninger->last_referanse;
+      //$skatteinnberetninger->update($year);
+      $update = 'UPDATE '.$skatteinnberetninger->getTableName().
+        ' SET last_referanse = %1 WHERE year = %2';
+      $params = array(
+        1 => array($last_referanse, 'Positive'),
+        2 => array($year, 'Positive'));
+      CRM_Core_DAO::executeQuery($update, $params);
+      $oppgave_config = CRM_Oppgavexml_Config::singleton();
+      $referanse = $oppgave_config->get_sender_organisasjonsnummer().'-'.$year.'-'.$last_referanse;
+    }
+    return $referanse;
+  }
 }

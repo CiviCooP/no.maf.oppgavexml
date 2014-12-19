@@ -23,4 +23,16 @@ class CRM_Oppgavexml_Upgrader extends CRM_Oppgavexml_Upgrader_Base {
     }
     return TRUE;
   }
+  /**
+   * Upgrade 1002 - add column last referanse to skatteinnberetninger
+   */
+  public function upgrade_1002() {
+    $this->ctx->log->info('Applying update 1002 (add last_referanse column to civicrm_skatteinnberetninger)');
+    if (CRM_Core_DAO::checkTableExists('civicrm_skatteinnberetninger')) {
+      if (!CRM_Core_DAO::checkFieldExists('civicrm_skatteinnberetninger', 'last_referanse')) {
+        CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_skatteinnberetninger ADD last_referanse INT(11)");
+      }
+    }
+    return TRUE;
+  }
 }

@@ -43,7 +43,6 @@ class CRM_Oppgavexml_Config {
   protected $_sender_kontakt_telefon = null;
   protected $_sender_kontakt_epost = null;
   protected $_sender_kontakt_mobil = null;
-  protected $_sender_leveranse_referanse = null;
   protected $_leveranse_type = null;
   /*
    * properties about the xml file and
@@ -171,16 +170,6 @@ class CRM_Oppgavexml_Config {
     return $this->_leveranse_type;
   }
   /**
-   * Function to return the sender leveranse referanse
-   * (file supplier reference code)
-   * 
-   * @return string
-   * @access public
-   */
-  public function get_sender_leveranse_referanse() {
-    return $this->_sender_leveranse_referanse;
-  }
-  /**
    * Function to return xml version for the xml file
    * 
    * @return string
@@ -303,7 +292,6 @@ class CRM_Oppgavexml_Config {
     $this->_sender_kontakt_telefon = '90576090';
     $this->_sender_kontakt_mobil = '90576090';
     $this->_sender_kontakt_epost = 'steinar@maf.no';
-    $this->_sender_leveranse_referanse = 'lev-2014-1-12-9-1-30';
     $this->_leveranse_type = 'ordinaer';
   }
   /**

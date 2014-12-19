@@ -24,6 +24,7 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
     $this->_tax_year = $year;
     $this->_total_count = 0;
     $this->_total_sum = 0;
+    $new_referanse = CRM_Oppgavexml_BAO_Skatteinnberetninger::get_new_referanse($this->_tax_year);
     $this->_xml = new SimpleXMLElement('<?xml version="'.$this->_xml_version
       .'" encoding="'.$this->_xml_encoding.'"?>'
       . '<melding xmlns="'.$this->_melding_xmlns.'" xmlns:xsi="'.$this->_melding_xmlns_xsi
@@ -32,7 +33,7 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
     $leveranse->addChild('kildesystem', $this->_sender_kilde_system);
     $this->add_oppgavegiver($leveranse);
     $leveranse->addChild('inntektsaar', $this->_tax_year);
-    $leveranse->addChild('oppgavegiversLeveranseReferanse', $this->_sender_leveranse_referanse);
+    $leveranse->addChild('oppgavegiversLeveranseReferanse', $new_referanse);
     $leveranse->addChild('leveransetype', $this->_leveranse_type);
     $this->add_test_donor_lines($leveranse);
     $this->add_footer($leveranse);
