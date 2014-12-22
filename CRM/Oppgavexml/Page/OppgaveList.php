@@ -12,8 +12,9 @@ require_once 'CRM/Core/Page.php';
 class CRM_Oppgavexml_Page_OppgaveList extends CRM_Core_Page {
   
   protected $_display_context = null;
-  protected $_context_contact_id = null;
-  protected $_context_tax_year = null;
+  protected $_request_contact_id = null;
+  protected $_request_tax_year = null;
+  protected $_request_donor_type = null;
   /**
    * Standard run function created when generating page with Civix
    * 
@@ -22,6 +23,7 @@ class CRM_Oppgavexml_Page_OppgaveList extends CRM_Core_Page {
   function run() {
     $this->set_page_configuration();
     $display_oppgaves = $this->get_oppgaves();
+    $this->assign('donor_type_options', array('All', 'Husholdning', 'Organisasjon', 'Person'));
     $this->assign('oppgaves', $display_oppgaves);
     parent::run();
   }
@@ -32,11 +34,7 @@ class CRM_Oppgavexml_Page_OppgaveList extends CRM_Core_Page {
    * @access protected
    */
   protected function get_oppgaves() {
-    if ($this->_display_context == 'contact') {
-      $params = $this->set_contact_params();
-    } else {
-      $params = $this->set_year_params();
-    }
+    $params = $this->set_filter_params();
     $oppgaves = CRM_Oppgavexml_BAO_Oppgave::get_values($params);
     foreach ($oppgaves as $oppgave_id => $oppgave) {
       $oppgaves[$oppgave_id]['actions'] = $this->set_row_actions($oppgave);
@@ -72,23 +70,23 @@ class CRM_Oppgavexml_Page_OppgaveList extends CRM_Core_Page {
     return $page_actions;
   }
   /**
-   * Function to set the params if the context is contact (tab on Contact Summary)
+   * Function to set the params for the retrieval of oppgaves based on
+   * properties loaded from request
    * 
    * @return array $params
    * @access protected
    */
-  protected function set_contact_params() {
-    $params = array('contact_id' => $this->_context_contact_id);
-    return $params;
-  }
-  /**
-   * Function to set the params if the context is year (Manage from Skatteinnberetninger list)
-   * 
-   * @return array $params
-   * @access protected
-   */  
-  protected function set_year_params() {
-    $params = array('year' => $this->_context_tax_year);
+  protected function set_filter_params() {
+    $params = array();
+    if (!empty($this->_request_contact_id)) {
+      $params['contact_id'] = $this->_request_contact_id;
+    }
+    if (!empty($this->_request_donor_type)) {
+      $params['donor_type'] = $this->_request_donor_type;
+    }
+    if (!empty($this->_request_tax_year)) {
+      $params['oppgave_year'] = $this->_request_tax_year;
+    }
     return $params;
   }
   /**
@@ -97,18 +95,43 @@ class CRM_Oppgavexml_Page_OppgaveList extends CRM_Core_Page {
    * @access protected
    */
   protected function set_page_configuration() {
-    CRM_Utils_System::setTitle(ts('Donoroppgave'));    
+    CRM_Utils_System::setTitle(ts('Donoroppgave'));
+    $this->retrieve_request_params();
+    $this->assign('display_type', $this->_display_context);
+    $this->assign('add_url', CRM_Utils_System::url('civicrm/oppgave', 
+      'action=add&cid='.$this->_request_contact_id.'&year='.
+      $this->_request_tax_year, true));  
+    $this->assign('baase', CRM_Utils_System::url('civicrm/oppgavelist', 
+      'cid='.$this->_request_contact_id.'&year='.$this->_request_tax_year, true));  
+    $session = CRM_Core_Session::singleton();
+    $session->pushUserContext(CRM_Utils_System::url('civicrm/oppgavelist', 'year='.$this->_request_tax_year));
+  }
+  /**
+   * Function to retrieve the params from the request and strore them in
+   * properties
+   * 
+   * @access protected
+   */
+  protected function retrieve_request_params() {
     $snippet = CRM_Utils_Request::retrieve('snippet', 'Positive');
+    $this->_request_contact_id = CRM_Utils_Request::retrieve('cid', 'Positive');
+    $this->_request_tax_year  = CRM_Utils_Request::retrieve('year', 'Positive');
+    $this->_request_donor_type = CRM_Utils_Request::retrieve('dt', 'String');
+    if (empty($this->_request_contact_id)) {
+      $this->assign('request_contact_id', 'All');    
+    } else {
+      $this->assign('request_contact_id', $this->_request_contact_id);
+    }
+    if (empty($this->_request_donor_type)) {
+      $this->assign('request_donor_type', 'All');
+    } else {
+      $this->assign('request_donor_type', $this->_request_donor_type);
+    }
+    $this->assign('request_tax_year', $this->_request_tax_year);
     if (!empty($snippet)) {
       $this->_display_context = 'contact';
-      $this->_context_contact_id = CRM_Utils_Request::retrieve('cid', 'Positive');
     } else {
       $this->_display_context = 'year';
-      $this->_context_tax_year = CRM_Utils_Request::retrieve('year', 'Positive');
     }
-    $this->assign('display_type', $this->_display_context);
-    $this->assign('add_url', CRM_Utils_System::url('civicrm/oppgave', 'action=add&cid='.$this->_context_contact_id.'&year='.$this->_context_tax_year, true));  
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/oppgavelist', 'year='.$this->_context_tax_year));
   }
 }

@@ -9,19 +9,7 @@
       </a>
     </div>
   {/if}
-  <div class="crm-activity-selector-donor_type">
-    <div class="crm-accordion-wrapper crm-search_filters-accordion">
-      <div class="crm-accordion-header"> Filter by Donor Type </div>
-      <div class="crm-accordion-body">
-        <div id="searchOptions" class="no-border form-layout-compressed">
-          <div class="crm-contact-form-block-donor_type_filter crm-inline-edit-field">
-            <label for="donor_type_filter">Donor Type</label>
-            <select id="donor_type_filter" class="big form-select" name="donor_type_filter">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>  
+  {include file='CRM/Oppgavexml/Page/OppgaveFilter.tpl'}
   <div id="oppgave_wrapper" class="dataTables_wrapper">
     <table id="oppgave-table" class="display">
       <thead>

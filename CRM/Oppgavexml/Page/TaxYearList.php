@@ -28,7 +28,7 @@ class CRM_Oppgavexml_Page_TaxYearList extends CRM_Core_Page {
   protected function set_row_actions($tax_year, $status_id) {
     $page_actions = array();
     $status_label = CRM_OppgaveXml_OptionGroup::get_status_option_label($status_id);
-    $manage_url = CRM_Utils_System::url('civicrm/oppgavelist', 'year='.$tax_year);
+    $manage_url = CRM_Utils_System::url('civicrm/oppgavelist', 'year='.$tax_year.'&cid=&dt=');
     $delete_url = CRM_Utils_System::url('civicrm/skatteinnberetninger', 'action=delete&year='.$tax_year, true);
     if ($status_label == ' New') {
       $page_actions[] = '<a class="action-item" title="Delete" href="'.$delete_url.'">Delete</a>';      
