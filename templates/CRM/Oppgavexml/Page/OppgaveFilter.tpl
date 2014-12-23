@@ -42,11 +42,12 @@
   <script type="text/javascript">
     function filterDonorType(oppgave_year) {
       var donor_type = document.getElementById("donor_type_filter").value;
-      var path = CRM.url('civicrm/oppgavelist');
       if (donor_type === 'All') {
-        window.location.replace(path + 'year=' + oppgave_year);
+        var path = CRM.url('civicrm/oppgavelist', {year:oppgave_year});
+        window.location.replace(path);
       } else {
-        window.location.replace(path + 'dt=' + donor_type + '&year=' + oppgave_year + '&cid=');
+        var path = CRM.url('civicrm/oppgavelist', {year:oppgave_year, cid:0, dt:donor_type});
+        window.location.replace(path);
       }
       return true;
     }
@@ -54,11 +55,12 @@
   <script type="text/javascript">
     function filterContactId(oppgave_year) {
       var contact_id = document.getElementById("contact_id_filter").value;
-      var path = CRM.url('civicrm/oppgavelist');
       if (contact_id === 'All') {
-        window.location.replace(path + 'year=' + oppgave_year);
+        var path = CRM.url('civicrm/oppgavelist', {year:oppgave_year});
+        window.location.replace(path);
       } else {
-        window.location.replace(path + 'cid=' + contact_id + '&year=' + oppgave_year + '&dt=');
+        var path = CRM.url('civicrm/oppgavelist', {year:oppgave_year, dt:'', cid:contact_id});
+        window.location.replace(path);
       }
       return true;
     }
