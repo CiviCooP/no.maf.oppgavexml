@@ -33,7 +33,7 @@ There is a scheduled job called ' Skatteinnberetninger - Export'  that needs the
 The configuration of the extension is in the file CRM/Oppgavexml/CRM/Config.php. 
 
 If the data about the sending organization needs to change, this can be modified in this part:
-<code>
+
   protected function set_sender_info() {
     $this->_sender_kilde_system = 'CiviCRM';
     $this->_sender_organisasjonsnummer = 'xxxxxxxx';
@@ -44,13 +44,13 @@ If the data about the sending organization needs to change, this can be modified
     $this->_sender_kontakt_epost = 'xxxxxxx';
     $this->_leveranse_type = 'ordinaer';
   }
-</code>
+
 The path where the result xml file will be put can be set in this part:
-<code>
+
   protected function set_xml_file_path() {
     $this->_xml_file_path = '/folder/folder/';
   }
-</code>
+
 
 <h2>Installation instructions</h2>
 After installation, make sure you change the paramters of the scheduled jobs before you can run them!
