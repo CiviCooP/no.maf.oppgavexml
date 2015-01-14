@@ -1,5 +1,5 @@
 <?php
-
+set_time_limit(0);
 /**
  * TaxDeclarationYear.Export API specification (optional)
  * This is used for documentation and validation.
