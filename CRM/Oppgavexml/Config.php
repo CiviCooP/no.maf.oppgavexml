@@ -260,7 +260,7 @@ class CRM_Oppgavexml_Config {
    * @access protected
    */
   protected function set_xml_file_path() {
-    $this->_xml_file_path = '/home/erik/';
+    $this->_xml_file_path = '/home/taxfiles/';
   }
   /**
    * Function to set the maximum deductible amount
