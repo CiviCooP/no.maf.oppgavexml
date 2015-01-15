@@ -98,10 +98,8 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
    */
   protected function add_oppgavegiver(&$leveranse) {
     $oppgavegiver = $leveranse->addChild('oppgavegiver');
-    $oppgavegiver->addChild('organisasjonsnummer', '910069772');
-    //$oppgavegiver->addChild('organisasjonsnummer', $this->_sender_organisasjonsnummer);
-    $oppgavegiver->addChild('organisasjonsnavn', 'NANNESTAD OG HEMSEDAL');
-    //$oppgavegiver->addChild('organisasjonsnavn', $this->_sender_organisasjonsnavn);
+    $oppgavegiver->addChild('organisasjonsnummer', $this->_sender_organisasjonsnummer);
+    $oppgavegiver->addChild('organisasjonsnavn', $this->_sender_organisasjonsnavn);
     $kontakt = $oppgavegiver->addChild('kontaktinformasjon');
     $kontakt->addChild('navn', $this->_sender_kontakt_navn);
     $kontakt->addChild('telefonnummer', $this->_sender_kontakt_telefon);
