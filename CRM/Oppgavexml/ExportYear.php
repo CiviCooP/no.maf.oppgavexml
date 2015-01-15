@@ -35,7 +35,7 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
     $leveranse->addChild('inntektsaar', $this->_tax_year);
     $leveranse->addChild('oppgavegiversLeveranseReferanse', $new_referanse);
     $leveranse->addChild('leveransetype', $this->_leveranse_type);
-    $this->add_test_donor_lines($leveranse);
+    $this->add_donor_lines($leveranse);
     $this->add_footer($leveranse);
     $this->set_file_name();
     $this->_xml->asXML($this->_xml_file_name);
