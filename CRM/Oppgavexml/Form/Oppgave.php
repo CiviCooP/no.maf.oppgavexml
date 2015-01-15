@@ -15,10 +15,10 @@ class CRM_Oppgavexml_Form_Oppgave extends CRM_Core_Form {
   protected $_oppgave_id = null;
   protected $_oppgave_year = null;
   protected $_donor_type_list = array();
-  /*
+  /**
    * Function to build the QuickForm
    * 
-   * @access publaric
+   * @access public
    */
   function buildQuickForm() {
     $this->set_option_lists();
