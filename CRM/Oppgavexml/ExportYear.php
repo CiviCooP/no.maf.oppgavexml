@@ -131,7 +131,8 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
   }
   protected function set_exported_date() {
     $export_date = date('Ymd');
-    $query = 'UPDATE civicrm_oppgave SET last_exported_date = %1 WHERE oppgave_year = %2';
+    $query = 'UPDATE civicrm_oppgave SET last_exported_date = %1
+      WHERE oppgave_year = %2 AND last_exported_date = NULL';
     $params = array(
       1 => array($export_date, 'Date'),
       2 => array($this->_tax_year, 'Positive')
