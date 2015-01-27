@@ -62,11 +62,14 @@ class CRM_Oppgavexml_ExportYear extends CRM_Oppgavexml_Config {
    * @access protected
    */
   protected function add_donor_lines(&$leveranse) {
-    $params = array('oppgave_year' => $this->_tax_year);
+    $params = array(
+      'oppgave_year' => $this->_tax_year);
     $donors = CRM_Oppgavexml_BAO_Oppgave::get_values($params);
     foreach ($donors as $donor) {
-      if (!empty($donor['donor_number'])) {
-        $this->write_oppgave_element($donor, $leveranse);
+      if (empty($donor['last_exported_date'])) {
+        if (!empty($donor['donor_number'])) {
+          $this->write_oppgave_element($donor, $leveranse);
+        }
       }
     }
   }
