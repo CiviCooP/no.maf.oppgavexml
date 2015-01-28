@@ -10,25 +10,26 @@
     </div>
   {/if}
   {include file='CRM/Oppgavexml/Page/OppgaveFilter.tpl'}
+  {include file='CRM/common/jsortable.tpl'}
   <div id="oppgave_wrapper" class="dataTables_wrapper">
     <table id="oppgave-table" class="display">
       <thead>
         <tr>
           {if $display_type eq 'contact'}
-            <th class="sorting-disabled" rowspan="1" colspan="1">{ts}Year{/ts}</th>
+            <th id="nosort">{ts}Year{/ts}</th>
           {/if}
           {if $display_type eq 'year'}
-            <th class="sorting-disabled" rowspan="1" colspan="1">{ts}Contact ID{/ts}</th>
+            <th>{ts}Contact ID{/ts}</th>
           {/if}
-          <th class="sorting-disabled" rowspan="1" colspan="1">{ts}Donor Type{/ts}</th>
-          <th class="sorting-disabled" rowspan="1" colspan="1">{ts}Donor Name{/ts}</th>
-          <th class="sorting-disabled" rowspan="1" colspan="1">{ts}Donor Number{/ts}</th>
-          <th class="sorting-disabled" rowspan="1" colspan="1">{ts}Deductible Amount{/ts}</th>
-          <th class="sorting-disabled" rowspan="1" colspan="1">{ts}Date Loaded{/ts}</th>
-          <th class="sorting-disabled" rowspan="1" colspan="1">{ts}Date Modified{/ts}</th>
-          <th class="sorting-disabled" rowspan="1" colspan="1">{ts}Modified By{/ts}</th>
-          <th class="sorting-disabled" rowspan="1" colspan="1">{ts}Date Exported{/ts}</th>
-          <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+          <th>{ts}Donor Type{/ts}</th>
+          <th>{ts}Donor Name{/ts}</th>
+          <th>{ts}Donor Number{/ts}</th>
+          <th>{ts}Deductible Amount{/ts}</th>
+          <th>{ts}Date Loaded{/ts}</th>
+          <th>{ts}Date Modified{/ts}</th>
+          <th>{ts}Modified By{/ts}</th>
+          <th>{ts}Date Exported{/ts}</th>
+          <th id="nosort"></th>
         </tr>
       </thead>
       <tbody>
