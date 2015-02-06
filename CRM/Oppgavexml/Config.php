@@ -1,7 +1,6 @@
 <?php
 /**
  * Class following Singleton pattern for specific extension configuration
- * as far as the default Case Relations are concerned for PUM
  *
  * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
  */
@@ -260,7 +259,7 @@ class CRM_Oppgavexml_Config {
    * @access protected
    */
   protected function set_xml_file_path() {
-    $this->_xml_file_path = '/home/maf/taxfiles/';
+    $this->_xml_file_path = '/home/erik/Documenten/civicoop/maf/taxfiles/';
   }
   /**
    * Function to set the maximum deductible amount
