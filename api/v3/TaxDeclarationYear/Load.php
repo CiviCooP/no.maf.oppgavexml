@@ -23,9 +23,9 @@ function civicrm_api3_tax_declaration_year_load($params) {
   validate_params($params);
   $dao = get_relevant_contacts($params['year']);
   if ($dao->N == 0) {
-    $return_values = array('All contacts for tax year processed');
+    $return_values = array('All contacts for tax year '.$params['year'].' processed');
   } else {
-    $return_values = array('Batch of 1000 contacts for tax year processed, you need to do more runs!');
+    $return_values = array('Batch of 1000 contacts for tax year '.$params['year'].' processed, you need to do more runs!');
   }
   while ($dao->fetch()) {
     set_processed($params['year'], $dao->contact_id);
