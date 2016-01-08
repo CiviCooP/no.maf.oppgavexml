@@ -10,6 +10,7 @@ class CRM_Oppgavexml_Upgrader extends CRM_Oppgavexml_Upgrader_Base {
   public function install() {
     $this->executeSqlFile('sql/create_civicrm_skatteinnberetninger.sql');
     $this->executeSqlFile('sql/create_civicrm_oppgave.sql');
+    $this->executeSqlFile('sql/create_civicrm_oppgave_processed.sql');
   }
   /**
    * Upgrade 1001 - modify column deductible amount to integer
@@ -33,6 +34,14 @@ class CRM_Oppgavexml_Upgrader extends CRM_Oppgavexml_Upgrader_Base {
         CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_skatteinnberetninger ADD last_referanse INT(11)");
       }
     }
+    return TRUE;
+  }
+  /**
+   * Upgrade 1003 - add table civicrm_oppgave_processed
+   */
+  public function upgrade_1003() {
+    $this->ctx->log->info('Applying update 1003 (add civicrm_oppgave_processed table)');
+    $this->executeSqlFile('sql/create_civicrm_oppgave_processed.sql');
     return TRUE;
   }
 }

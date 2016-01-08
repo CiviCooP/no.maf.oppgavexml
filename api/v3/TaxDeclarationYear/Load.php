@@ -21,32 +21,24 @@ function _civicrm_api3_tax_declaration_year_load_spec(&$spec) {
  */
 function civicrm_api3_tax_declaration_year_load($params) {
   validate_params($params);
-  $return_values = array();
-  remove_year_records($params);
   $dao = get_relevant_contacts($params['year']);
+  if ($dao->N == 0) {
+    $return_values = array('All contacts for tax year processed');
+  } else {
+    $return_values = array('Batch of 1000 contacts for tax year processed, you need to do more runs!');
+  }
   while ($dao->fetch()) {
+    set_processed($params['year'], $dao->contact_id);
     create_contact_oppgave($params, $dao);
   }
   create_skatteinnberetninger($params);  
   return civicrm_api3_create_success($return_values, $params, 'TaxDeclarationYear', 'Load');
 }
 /**
- * Function to remove existing records for the year (only if reload = 0)
- * 
- * @param array $params
- */
-function remove_year_records($params) {
-  if ($params['reload'] == 0) {
-    $delete_query = 'DELETE FROM civicrm_oppgave WHERE oppgave_year = %1';
-    $delete_params = array(1 => array($params['year'], 'Positive'));
-    CRM_Core_DAO::executeQuery($delete_query, $delete_params);
-  }
-}
-/**
  * Function to retrieve all required contacts with their total deductible amount
  * 
  * @param int $year
- * @return obj $dao
+ * @return object $dao
  */
 function get_relevant_contacts($year) {
   $start_date = $year.'-01-01 00:00:00';
@@ -56,11 +48,13 @@ function get_relevant_contacts($year) {
     FROM civicrm_contribution 
     WHERE (receive_date BETWEEN %1 AND %2) 
     AND contribution_status_id = %3 
-    GROUP BY contact_id';
+    AND contact_id NOT IN(SELECT contact_id FROM civicrm_oppgave_processed WHERE oppgave_year = %4 AND processed = %3)
+    GROUP BY contact_id LIMIT 1000';
   $params = array(
     1 => array($start_date, 'String'),
     2 => array($end_date, 'String'),
-    3 => array(1, 'Positive'));
+    3 => array(1, 'Positive'),
+    4 => array($year, 'Positive'));
   $dao = CRM_Core_DAO::executeQuery($query, $params);
   return $dao;
 }
@@ -68,16 +62,10 @@ function get_relevant_contacts($year) {
  * Function to create contact oppgave if params valid
  * 
  * @param array $params
- * @param obj $dao
+ * @param object $dao
  */
 function create_contact_oppgave($params, $dao) {
-  $create_contact = TRUE;
-  if ($params['reload'] == 1) {
-    if (contact_exists_in_oppgave($dao->contact_id, $params['year']) == TRUE) {
-      $create_contact = FALSE;
-    }
-  }
-  if ($create_contact == TRUE) {
+  if (!contact_exists_in_oppgave($dao->contact_id, $params['year'])) {
     $create_params = set_oppgave_params($params['year'], $dao);
     if (!empty($create_params)) {
       $query = 'INSERT INTO civicrm_oppgave (oppgave_year, contact_id, donor_type, '
@@ -113,7 +101,7 @@ function contact_exists_in_oppgave($contact_id, $oppgave_year) {
  * Function to create params list for create oppgave
  * 
  * @param int $year
- * @param obj $dao
+ * @param object $dao
  * @return array $params
  */
 function set_oppgave_params($year, $dao) {
@@ -213,11 +201,7 @@ function get_custom_data($contact_id) {
  * @param array $params
  */
 function create_skatteinnberetninger($params) {
-  if ($params['reload'] == 0) {
-    $query = 'REPLACE INTO civicrm_skatteinnberetninger (year, status_id) VALUES(%1, %2)';
-  } else {
-    $query = 'UPDATE civicrm_skatteinnberetninger SET status_id = %2 WHERE year = %1';
-  }
+  $query = 'REPLACE INTO civicrm_skatteinnberetninger (year, status_id) VALUES(%1, %2)';
   $query_params = array(
     1 => array($params['year'], 'Positive'),
     2 => array(2, 'Positive'));
@@ -228,21 +212,13 @@ function create_skatteinnberetninger($params) {
  * 
  * @param array $params
  * @throws API_Exception when no param year found
- * @throws API_Exception when no param reload found
- * @throws API_Exception when param reload not 0 or 1
  * @throws API_Exception when param year is empty
  * @throws API_Exception when param year is not 4 digits long
  * @throws API_Exception when param year is not numeric
  */
-function validate_params($params) {
+function validate_params(&$params) {
   if (!array_key_exists('year', $params)) {
     throw new API_Exception('Year is a mandatory param but is not found in passed params');
-  }
-  if (!array_key_exists('reload', $params)) {
-    $params['reload'] = 0;
-  }
-  if ($params['reload'] != 1 && $params['reload'] != 0) {
-    throw new API_Exception('Reload param can only be 0 or 1');
   }
   if (empty($params['year'])) {
     throw new API_Exception('Param year can not be empty');
@@ -252,5 +228,29 @@ function validate_params($params) {
   }
   if (!is_numeric($params['year'])) {
     throw new API_Exception('Year has to be numeric');
+  }
+}
+
+/**
+ * Function to set processed for contacts and year
+ *
+ * @param int $year
+ * @param int $contactId
+ */
+function set_processed($year, $contactId) {
+  $params = array(
+    1 => array($year, 'Integer'),
+    2 => array($contactId, 'Integer'),
+    3 => array(1, 'Integer')
+  );
+  $qryExists = "SELECT id FROM civicrm_oppgave_processed WHERE oppgave_year = %1 AND contact_id = %2";
+  $daoContactProcessed = CRM_Core_DAO::executeQuery($qryExists, $params);
+  if ($daoContactProcessed->fetch()) {
+    $params[4] = array($daoContactProcessed->id, 'Integer');
+    $qryUpdate = "UPDATE civicrm_oppgave_processed SET processed = %3 WHERE id = %4";
+    CRM_Core_DAO::executeQuery($qryUpdate, $params);
+  } else {
+    $qryNew = "INSERT INTO civicrm_oppgave_processed SET oppgave_year = %1, contact_id = %2, processed = %3";
+    CRM_Core_DAO::executeQuery($qryNew, $params);
   }
 }

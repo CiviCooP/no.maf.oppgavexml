@@ -13,4 +13,4 @@ CREATE TABLE IF NOT EXISTS `civicrm_oppgave` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   INDEX `year_contact INDEX` (`oppgave_year` ASC, `contact_id` ASC))
-ENGINE = InnoDB
+ENGINE = InnoDB;
