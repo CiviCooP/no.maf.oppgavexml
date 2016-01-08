@@ -10,7 +10,6 @@ set_time_limit(0);
  */
 function _civicrm_api3_tax_declaration_year_load_spec(&$spec) {
   $spec['year']['api_required'] = 1;
-  $spec['reload']['api_required'] = 1;
 }
 /**
  * TaxDeclarationYear.Load API
@@ -240,7 +239,7 @@ function validate_params($params) {
     throw new API_Exception('Year is a mandatory param but is not found in passed params');
   }
   if (!array_key_exists('reload', $params)) {
-    throw new API_Exception('Reload is a mandatory param but is not found in passed params');
+    $params['reload'] = 0;
   }
   if ($params['reload'] != 1 && $params['reload'] != 0) {
     throw new API_Exception('Reload param can only be 0 or 1');
