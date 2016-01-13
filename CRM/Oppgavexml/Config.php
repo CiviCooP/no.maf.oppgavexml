@@ -268,7 +268,7 @@ class CRM_Oppgavexml_Config {
    * @access protected
    */
   protected function set_max_deductible_amount() {
-    $this->_max_deductible_amount = 16800;
+    $this->_max_deductible_amount = 20000;
   }
   /**
    * Function to set the minimum deductible amount
