@@ -44,4 +44,15 @@ class CRM_Oppgavexml_Upgrader extends CRM_Oppgavexml_Upgrader_Base {
     $this->executeSqlFile('sql/create_civicrm_oppgave_processed.sql');
     return TRUE;
   }
+  /**
+   * Upgrade 1004 - remove column from civicrm_oppgave_processed
+   */
+  public function upgrade_1004() {
+    $this->ctx->log->info('Applying update 1004 (remove column processed from civicrm_oppgave_processed table)');
+    if (CRM_Core_DAO::checkFieldExists('civicrm_oppgave_processed', 'processed')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_oppgave_processed DROP COLUMN processed");
+    }
+    $this->executeSqlFile('sql/create_civicrm_oppgave_processed.sql');
+    return TRUE;
+  }
 }

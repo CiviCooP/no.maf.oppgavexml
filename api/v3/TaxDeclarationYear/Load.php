@@ -20,20 +20,26 @@ function _civicrm_api3_tax_declaration_year_load_spec(&$spec) {
  * @see civicrm_api3_create_error
  */
 function civicrm_api3_tax_declaration_year_load($params) {
-  validate_params($params);
-  initiate_processed($params['year']);
-  $dao = get_relevant_contacts($params['year']);
+  $logger = new CRM_Oppgavexml_OppgaveLogger();
+  validateParams($params);
+  $dao = getRelevantContacts($params['year']);
 
   if ($dao->N == 0) {
-    $return_values = array('All contacts for tax year '.$params['year'].' processed');
+    resetProcessed($params['year']);
+    $returnValues = array('All contacts for tax year '.$params['year'].' processed');
+    $logger->logMessage('Info', 'No more contacts to be processed found for year '.$params['year']);
   } else {
-    $return_values = array('Batch of 1000 contacts for tax year '.$params['year'].' processed, you need to do more runs or you have donors without personsnummer (check table civicrm_oppgave_processed where processed = 0)!');
+    $returnValues = array('Batch of 1000 contacts for tax year '.$params['year'].' processed, you need to do more runs!');
+    $logger->logMessage('Info', 'Batch of 1000 contacts processed for year '.$params['year']);
   }
   while ($dao->fetch()) {
-    create_contact_oppgave($params, $dao);
+    setProcessed($params['year'], $dao->contact_id);
+    $logger->logMessage('Info', 'Contact '.$dao->contact_id.' with total deductible amount '.$dao->deductible_amount
+      .' read, will now be checked');
+    createContactOppgave($params, $dao, $logger);
   }
-  create_skatteinnberetninger($params);  
-  return civicrm_api3_create_success($return_values, $params, 'TaxDeclarationYear', 'Load');
+  createSkatteinnberetninger($params);
+  return civicrm_api3_create_success($returnValues, $params, 'TaxDeclarationYear', 'Load');
 }
 /**
  * Function to retrieve all required contacts with their total deductible amount
@@ -41,21 +47,24 @@ function civicrm_api3_tax_declaration_year_load($params) {
  * @param int $year
  * @return object $dao
  */
-function get_relevant_contacts($year) {
-  $start_date = $year.'-01-01 00:00:00';
-  $end_date = $year.'-12-31 23:59:59';
-  $query = 'SELECT contact_id, 
-    SUM(total_amount - non_deductible_amount) AS deductible_amount 
-    FROM civicrm_contribution 
-    WHERE (receive_date BETWEEN %1 AND %2) 
-    AND contribution_status_id = %3 
-    AND contact_id NOT IN(SELECT contact_id FROM civicrm_oppgave_processed WHERE oppgave_year = %4 AND processed = %3)
-    GROUP BY contact_id LIMIT 1000';
+function getRelevantContacts($year) {
+  $config = CRM_Oppgavexml_Config::singleton();
+  $startDate = $year.'-01-01 00:00:00';
+  $endDate = $year.'-12-31 23:59:59';
+  $minAmount = $config->get_min_deductible_amount();
+
+  $query = 'SELECT contact_id, SUM(total_amount - non_deductible_amount) AS deductible_amount
+    FROM civicrm_contribution
+    WHERE receive_date BETWEEN %1 AND %2 AND contribution_status_id = %3
+    AND contact_id NOT IN(SELECT contact_id FROM civicrm_oppgave WHERE oppgave_year = %4)
+    AND contact_id NOT IN(SELECT contact_id FROM civicrm_oppgave_processed WHERE oppgave_year = %4)
+    GROUP BY contact_id HAVING SUM(total_amount - non_deductible_amount) >= %5 LIMIT 1000';
   $params = array(
-    1 => array($start_date, 'String'),
-    2 => array($end_date, 'String'),
+    1 => array($startDate, 'String'),
+    2 => array($endDate, 'String'),
     3 => array(1, 'Positive'),
-    4 => array($year, 'Positive'));
+    4 => array($year, 'Positive'),
+    5 => array($minAmount, 'Integer'));
 
   $dao = CRM_Core_DAO::executeQuery($query, $params);
   return $dao;
@@ -65,146 +74,154 @@ function get_relevant_contacts($year) {
  * 
  * @param array $params
  * @param object $dao
+ * @param object $logger
  */
-function create_contact_oppgave($params, $dao) {
-  if (!contact_exists_in_oppgave($dao->contact_id, $params['year'])) {
-    $create_params = set_oppgave_params($params['year'], $dao);
-    if (!empty($create_params)) {
+function createContactOppgave($params, $dao, $logger) {
+  if (!contactExistsInOppgave($dao->contact_id, $params['year'])) {
+    $createParams = setOppgaveParams($params['year'], $dao, $logger);
+    if (!empty($createParams)) {
       $query = 'INSERT INTO civicrm_oppgave (oppgave_year, contact_id, donor_type, '
         . 'donor_name, donor_number, deductible_amount, loaded_date) '
         . 'VALUES(%1, %2, %3, %4, %5, %6, %7)';
-      CRM_Core_DAO::executeQuery($query, $create_params);
+      CRM_Core_DAO::executeQuery($query, $createParams);
+      $logger->logMessage('Info', 'Contact '.$dao->contact_id.' added to tax file civicrm_oppgave for '.$params['year']);
     }
+  } else {
+    $logger->logMessage('Info', 'Contact '.$dao->contact_id.' already exists in tax file civicrm_oppgave for '.$params['year']
+      .', contact ignored');
   }
 }
 /**
  * Function to check if contact already exists in file for year
  * 
- * @param int $contact_id
- * @param int $oppgave_year
+ * @param int $contactId
+ * @param int $oppgaveYear
  * @return boolean
  */
-function contact_exists_in_oppgave($contact_id, $oppgave_year) {
-  $contact_exists = FALSE;
+function contactExistsInOppgave($contactId, $oppgaveYear) {
   $query = 'SELECT COUNT(*) AS donor_count FROM civicrm_oppgave WHERE contact_id = %1 '
     . 'AND oppgave_year = %2';
   $params = array(
-    1 => array($contact_id, 'Positive'),
-    2 => array($oppgave_year, 'Positive'));
+    1 => array($contactId, 'Positive'),
+    2 => array($oppgaveYear, 'Positive'));
   $dao = CRM_Core_DAO::executeQuery($query, $params);
   if ($dao->fetch()) {
     if ($dao->donor_count > 0) {
-      $contact_exists = TRUE;
+      return TRUE;
     }
   }
-  return $contact_exists;
+  return FALSE;
 }
 /**
  * Function to create params list for create oppgave
  * 
  * @param int $year
  * @param object $dao
+ * @param object $logger
  * @return array $params
  */
-function set_oppgave_params($year, $dao) {
+function setOppgaveParams($year, $dao, $logger) {
   $params = array();
-  $oppgave_config = CRM_Oppgavexml_Config::singleton();
-  $min_amount = $oppgave_config->get_min_deductible_amount();
-  $max_amount = $oppgave_config->get_max_deductible_amount();
-  if ($dao->deductible_amount >= $min_amount) {
-    if ($dao->deductible_amount > $max_amount) {
-      $dao->deductible_amount = $max_amount;
+  $config = CRM_Oppgavexml_Config::singleton();
+  $minAmount = $config->get_min_deductible_amount();
+  $maxAmount = $config->get_max_deductible_amount();
+  if ($dao->deductible_amount >= $minAmount) {
+    if ($dao->deductible_amount > $maxAmount) {
+      $dao->deductible_amount = $maxAmount;
     }
-    $donor_data = get_donor_data($dao->contact_id);
-    if (validate_data($donor_data) == TRUE) {
-      set_processed($year, $dao->contact_id);
+    $logger->logMessage('Info', 'Deductible Amount set to '.$dao->deductible_amount.' for contact '.$dao->contact_id
+      .', year '.$year);
+    $donorData = getDonorData($dao->contact_id);
+    if (validateData($donorData) == TRUE) {
       $params = array(
         1 => array($year, 'Positive'),
         2 => array($dao->contact_id, 'Positive'),
-        3 => array($donor_data['type'], 'String'),
-        4 => array($donor_data['name'], 'String'),
-        5 => array($donor_data['number'], 'String'),
+        3 => array($donorData['type'], 'String'),
+        4 => array($donorData['name'], 'String'),
+        5 => array($donorData['number'], 'String'),
         6 => array($dao->deductible_amount, 'Money'),
         7 => array(date('Ymd'), 'Date'));
+    } else {
+      $logger->logMessage('Error', 'No person/organisasjonsnummer found for contact '.$dao->contact_id.', year '.$year);
     }
   }
   return $params;
 }
 /**
  * Function to get the donor data
- * @param int $contact_id
- * @return array $donor_data
+ * @param int $contactId
+ * @return array $donorData
  */
-function get_donor_data($contact_id) {
-  $params = array('id' => $contact_id);
+function getDonorData($contactId) {
+  $params = array('id' => $contactId);
   try {
-    $contact_data = civicrm_api3('Contact', 'Getsingle', $params);
-    $donor_data = pull_donor_data($contact_data);
+    $contactData = civicrm_api3('Contact', 'Getsingle', $params);
+    $donorData = pullDonorData($contactData);
   } catch (CiviCRM_API3_Exception $ex) {
-    $donor_data = array();
+    $donorData = array();
   }
-  return $donor_data;
+  return $donorData;
 }
 /**
  * Function to pull donor data from api contact getsingle result array
  * 
- * @param array $contact_data
- * @return array $donor_data
+ * @param array $contactData
+ * @return array $donorData
  */
-function pull_donor_data($contact_data) {
-  $donor_data = array();
-  $donor_data['name'] = $contact_data['display_name'];
-  $custom_data = get_custom_data($contact_data['id']);
-  switch ($contact_data['contact_type']) {
+function pullDonorData($contactData) {
+  $donorData = array();
+  $donorData['name'] = $contactData['display_name'];
+  $customData = getCustomData($contactData['id']);
+  switch ($contactData['contact_type']) {
     case 'Individual':
-      $donor_data['type'] = 'Person';
-      $donor_data['number'] = $custom_data['personsnummer'];
+      $donorData['type'] = 'Person';
+      $donorData['number'] = $customData['personsnummer'];
       break;
     case 'Household':
-      $donor_data['type'] = 'Husholdning';
-      $donor_data['number'] = $custom_data['personsnummer'];
+      $donorData['type'] = 'Husholdning';
+      $donorData['number'] = $customData['personsnummer'];
     break;
     case 'Organization':
-      $donor_data['type'] = 'Organisasjon';
-      $donor_data['number'] = $custom_data['organisasjonsnummer'];
+      $donorData['type'] = 'Organisasjon';
+      $donorData['number'] = $customData['organisasjonsnummer'];
     break;
   }
-  return $donor_data;
+  return $donorData;
 }
 /**
  * Function to get custom data for person/organisasjonsnummer
  * 
- * @param int $contact_id
- * @return array $custom_data
+ * @param int $contactId
+ * @return array $customData
  */
-function get_custom_data($contact_id) {
-  $oppgave_config = CRM_Oppgavexml_Config::singleton();
-  $table_name = $oppgave_config->get_contact_custom_group_table();
-  $column_person = $oppgave_config->get_personsnummer_custom_field_column();
-  $column_org = $oppgave_config->get_organisasjonsnummer_custom_field_column();
-  $query = ' SELECT * FROM '.$table_name.' WHERE entity_id = %1';
-  $params = array(1 => array($contact_id, 'Positive'));
+function getCustomData($contactId) {
+  $config = CRM_Oppgavexml_Config::singleton();
+  $tableName = $config->get_contact_custom_group_table();
+  $columnPerson = $config->get_personsnummer_custom_field_column();
+  $columnOrg = $config->get_organisasjonsnummer_custom_field_column();
+  $query = ' SELECT * FROM '.$tableName.' WHERE entity_id = %1';
+  $params = array(1 => array($contactId, 'Positive'));
   $dao = CRM_Core_DAO::executeQuery($query, $params);
   if ($dao->fetch()) {
-    $custom_data['personsnummer'] = $dao->$column_person;
-    $custom_data['organisasjonsnummer'] = $dao->$column_org;
+    $customData['personsnummer'] = $dao->$columnPerson;
+    $customData['organisasjonsnummer'] = $dao->$columnOrg;
   } else {
-    $custom_data['personsnummer'] = '';
-    $custom_data['organisasjonsnummer'] = '';    
+    $customData['personsnummer'] = '';
+    $customData['organisasjonsnummer'] = '';
   }
-  return $custom_data;
+  return $customData;
 }
 /**
  * Function to update the status of the tax declaration year
  * 
  * @param array $params
  */
-function create_skatteinnberetninger($params) {
+function createSkatteinnberetninger($params) {
   $query = 'REPLACE INTO civicrm_skatteinnberetninger (year, status_id) VALUES(%1, %2)';
-  $query_params = array(
+  $queryParams = array(
     1 => array($params['year'], 'Positive'),
     2 => array(2, 'Positive'));
-  CRM_Core_DAO::executeQuery($query, $query_params);
+  CRM_Core_DAO::executeQuery($query, $queryParams);
 }
 /**
  * Function to validate incoming params
@@ -215,7 +232,7 @@ function create_skatteinnberetninger($params) {
  * @throws API_Exception when param year is not 4 digits long
  * @throws API_Exception when param year is not numeric
  */
-function validate_params(&$params) {
+function validateParams(&$params) {
   if (!array_key_exists('year', $params)) {
     throw new API_Exception('Year is a mandatory param but is not found in passed params');
   }
@@ -229,70 +246,34 @@ function validate_params(&$params) {
     throw new API_Exception('Year has to be numeric');
   }
 }
-
-/**
- * Initially all donors that could be selected need to be added to civicrm_oppgave_processed
- * if they are not in there already
- *
- * @param $year
- */
-function initiate_processed ($year) {
-  $start_date = $year.'-01-01 00:00:00';
-  $end_date = $year.'-12-31 23:59:59';
-  $queryContact = 'SELECT contact_id,
-    SUM(total_amount - non_deductible_amount) AS deductible_amount
-    FROM civicrm_contribution
-    WHERE (receive_date BETWEEN %1 AND %2)
-    AND contribution_status_id = %3
-    GROUP BY contact_id';
-  $paramsContact = array(
-    1 => array($start_date, 'String'),
-    2 => array($end_date, 'String'),
-    3 => array(1, 'Positive'),
-    4 => array($year, 'Positive'));
-  $contact = CRM_Core_DAO::executeQuery($queryContact, $paramsContact);
-  while ($contact->fetch()) {
-    $countQuery = 'SELECT COUNT(*) FROM civicrm_oppgave_processed WHERE oppgave_year = %1 AND contact_id = %2';
-    $countParams = array(
-      1 => array($year, 'Positive'),
-      2 => array($contact->contact_id, 'Positive')
-    );
-    $count = CRM_Core_DAO::singleValueQuery($countQuery, $countParams);
-    if ($count == 0) {
-      $queryProcessed = 'INSERT INTO civicrm_oppgave_processed (oppgave_year, contact_id, processed) VALUES(%1, %2, %3)';
-      $paramsProcessed = array(
-        1 => array($year, 'Positive'),
-        2 => array($contact->contact_id, 'Positive'),
-        3 => array(0, 'Positive')
-      );
-      CRM_Core_DAO::executeQuery($queryProcessed, $paramsProcessed);
-    }
-  }
-}
 /**
  * Function to set processed for contacts and year
  *
  * @param int $year
  * @param int $contactId
  */
-function set_processed($year, $contactId) {
+function setProcessed($year, $contactId) {
+  $query = "INSERT INTO civicrm_oppgave_processed (contact_id, oppgave_year) VALUES(%1, %2)";
   $params = array(
-    1 => array(1, 'Integer'),
-    2 => array($contactId, 'Integer'),
-    3 => array($year, 'Integer')
+    1 => array($contactId, 'Integer'),
+    2 => array($year, 'Integer')
   );
-  $qryUpdate = "UPDATE civicrm_oppgave_processed SET processed = %1 WHERE contact_id = %2 AND oppgave_year = %3";
-    CRM_Core_DAO::executeQuery($qryUpdate, $params);
+  CRM_Core_DAO::executeQuery($query, $params);
+}
+
+function resetProcessed($year) {
+  $query = "DELETE FROM civicrm_oppgave_processed WHERE oppgave_year = %1";
+  CRM_Core_DAO::executeQuery($query, array(1 => array($year, 'Integer')));
 }
 
 /**
  * Function to check if the contact has a personsnummer or organisationsnummer
  *
- * @param $donor_data
+ * @param $donorData
  * @return boolean
  */
-function validate_data($donor_data) {
-  if (empty($donor_data['number'])) {
+function validateData($donorData) {
+  if (empty($donorData['number'])) {
     return FALSE;
   } else {
     return TRUE;
