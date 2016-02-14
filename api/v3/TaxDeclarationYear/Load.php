@@ -53,17 +53,17 @@ function getRelevantContacts($year) {
   $endDate = $year.'-12-31 23:59:59';
   $minAmount = $config->get_min_deductible_amount();
 
-  $query = 'SELECT contact_id, SUM(total_amount - non_deductible_amount) AS deductible_amount
-    FROM civicrm_contribution
-    WHERE receive_date BETWEEN %1 AND %2 AND contribution_status_id = %3
-    AND contact_id NOT IN(SELECT contact_id FROM civicrm_oppgave WHERE oppgave_year = %4)
-    AND contact_id NOT IN(SELECT contact_id FROM civicrm_oppgave_processed WHERE oppgave_year = %4)
-    GROUP BY contact_id HAVING SUM(total_amount - non_deductible_amount) >= %5 LIMIT 1000';
+  $query = 'SELECT  a.contact_id, receive_date, SUM(total_amount - non_deductible_amount) AS deductible_amount,
+    b.contact_id AS loaded_contact
+    FROM civicrm_contribution a LEFT JOIN civicrm_oppgave_processed b ON a.contact_id = b.contact_id
+    AND oppgave_year = %1
+    WHERE receive_date BETWEEN %2 AND %3  AND contribution_status_id = %4 AND b.contact_id IS NULL
+    GROUP BY a.contact_id HAVING SUM(total_amount - non_deductible_amount) >= %5 LIMIT 1000';
   $params = array(
-    1 => array($startDate, 'String'),
-    2 => array($endDate, 'String'),
-    3 => array(1, 'Positive'),
-    4 => array($year, 'Positive'),
+    1 => array($year, 'Positive'),
+    2 => array($startDate, 'String'),
+    3 => array($endDate, 'String'),
+    4 => array(1, 'Positive'),
     5 => array($minAmount, 'Integer'));
 
   $dao = CRM_Core_DAO::executeQuery($query, $params);
