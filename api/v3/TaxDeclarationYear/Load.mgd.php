@@ -16,7 +16,7 @@ return array (
       'run_frequency' => 'Daily',
       'api_entity' => 'TaxDeclarationYear',
       'api_action' => 'Load',
-      'parameters' => 'year = [2013, year to be reported on] required / reload = [0 first load for year or 1 add contacts to existing year] required',
+      'parameters' => 'year = [2013, year to be reported on] required',
       'is_active' => 0
     ),
   ),
