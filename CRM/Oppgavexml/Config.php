@@ -28,9 +28,10 @@ class CRM_Oppgavexml_Config {
   /*
    * property for custom group and custom fields for personsnummer and organisasjonsnummer
    */
-  protected $_contact_custom_group_table = null;
-  protected $_personsnummer_custom_field_column = null;
-  protected $_organisasjonsnummer_custom_field_column = null;
+  private $_mafPersonCustomGroupTableName = NULL;
+  private $_mafOrganisationCustomGroupTableName = NULL;
+  private $_mafPersonNummerColumnName = NULL;
+  private $_mafOrganisasjonsNummerColumnName = NULL;
   /*
    * properties to hold the information about the sending organisation
    * and the file type
@@ -60,35 +61,45 @@ class CRM_Oppgavexml_Config {
     $this->set_min_deductible_amount();
     $this->set_sender_info();
     $this->set_xml_headers();
-    $this->set_custom_data();
+    $this->setCustomGroupAndField('maf_person', '_mafPersonCustomGroupTableName', 'personnummer', '_mafPersonNummerColumnName');
+    $this->setCustomGroupAndField('maf_organisation', '_mafOrganisationCustomGroupTableName', 'organisasjonsnummer', '_mafOrganisasjonsNummerColumnName');
   }
+
   /**
-   * Function to return the custom group table name for the maf_norway_import custom group
-   * 
-   * @return int
-   * @access public
+   * Getter for maf person custom group table name
+   *
+   * @return null
    */
-  public function get_contact_custom_group_table() {
-    return $this->_contact_custom_group_table;
+  public function getMafPersonCustomGroupTableName() {
+    return $this->_mafPersonCustomGroupTableName;
   }
+
   /**
-   * Function to return the custom field column for personsnummer
-   * 
-   * @return int
-   * @access public
+   * Getter for maf organisation custom group table name
+   *
+   * @return null
    */
-  public function get_personsnummer_custom_field_column() {
-    return $this->_personsnummer_custom_field_column;
+  public function getMafOrganisationCustomGroupTableName() {
+    return $this->_mafOrganisationCustomGroupTableName;
   }
+
   /**
-   * Function to return the custom field column for organisasjonsnummer
-   * 
-   * @return int
-   * @access public
+   * Getter for maf person nummer custom field column name
+   *
+   * @return null
    */
-  public function get_organisasjonsnummer_custom_field_column() {
-    return $this->_organisasjonsnummer_custom_field_column;
+  public function getMafPersonNummerColumnName() {
+    return $this->_mafPersonNummerColumnName;
   }
+
+  /**
+   * Getter for maf organisasjons nummer custom field column name
+   * @return null
+   */
+  public function getMafOrganisasjonsNummerColumnName() {
+    return $this->_mafOrganisasjonsNummerColumnName;
+  }
+
   /**
    * Function to return the sender kilde system
    * 
@@ -259,7 +270,10 @@ class CRM_Oppgavexml_Config {
    * @access protected
    */
   protected function set_xml_file_path() {
-    $this->_xml_file_path = '/home/erik/Documenten/civicoop/maf/taxfiles/';
+    $container = CRM_Extension_System::singleton()->getFullContainer();
+    $resourcePath = $container->getPath('no.maf.generic').'/CRM/Generic/ConfigItems/resources/';
+
+    $this->_xml_file_path = $container->getPath('no.maf.oppgavexml').'/export/';
   }
   /**
    * Function to set the maximum deductible amount
@@ -305,30 +319,32 @@ class CRM_Oppgavexml_Config {
     $this->_melding_xmlns_xsi = 'http://www.w3.org/2001/XMLSchema-instance';
     $this->_melding_xsi_schema_location = 'urn:ske:fastsetting:innsamling:gavefrivilligorganisasjon:v2 gavefrivilligorganisasjon_v2_0.xsd';
   }
+
   /**
    * Function to set custom data
    * 
-   * @throws Exception when custom group maf_norway_import not found
-   * @access protected
+   * @throws Exception when custom group or custom field not found
    */
-  protected function set_custom_data() {
-    $custom_group_params = array('name' => 'maf_norway_import');
+  private function setCustomGroupAndField($customGroupName, $groupProperty, $customFieldName, $fieldProperty) {
     try {
-      $custom_group = civicrm_api3('CustomGroup', 'Getsingle', $custom_group_params);
-      $this->_contact_custom_group_table = $custom_group['table_name'];
-    } catch (CiviCRM_API3_Exception $ex) {
-      throw new Exception('Could not find custom group with name maf_norway_import, '
-        . 'error from API CustomGroup Getsingle: '.$ex->getMessage());
+      $customGroup = civicrm_api3('CustomGroup', 'getsingle', array('name' => $customGroupName,));
     }
-    $custom_fields = civicrm_api3('CustomField', 'Get', 
-      array('custom_group_id' => $custom_group['id']));
-    foreach ($custom_fields['values'] as $custom_field) {
-      if ($custom_field['name'] == 'personsnummer') {
-        $this->_personsnummer_custom_field_column = $custom_field['column_name'];
-      }
-      if ($custom_field['name'] == 'organisasjonsnummer') {
-        $this->_organisasjonsnummer_custom_field_column = $custom_field['column_name'];
-      }
+    catch (CiviCRM_API3_Exception $ex) {
+      throw new Exception('Could not find a custom group with name '.$customGroupName.' in '.__METHOD__
+        .', contact your system administrator. Error from API CustomGroup getsingle : '.$ex->getMessage());
+    }
+    $this->$groupProperty = $customGroup['table_name'];
+    try {
+      $this->$fieldProperty = civicrm_api3('CustomField', 'getvalue', array(
+        'custom_group_id' => $customGroup['id'],
+        'name' => $customFieldName,
+        'return' => 'column_name',
+      ));
+    }
+    catch (CiviCRM_API3_Exception $ex) {
+      throw new Exception('Could not find a custom field with name '.$customFieldName.' within custom group '
+        .$customGroupName.' in '.__METHOD__.', contact your system administrator. Error from API CustomField getvalue : '
+        .$ex->getMessage());
     }
   }
 }
