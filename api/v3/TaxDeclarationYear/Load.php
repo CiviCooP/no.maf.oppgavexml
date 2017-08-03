@@ -171,19 +171,16 @@ function getDonorData($contactId) {
 function pullDonorData($contactData) {
   $donorData = array();
   $donorData['name'] = $contactData['display_name'];
-  $customData = getCustomData($contactData['id']);
+  $customData = getCustomData($contactData['id'], $contactData['contact_type']);
+  $donorData['number'] = $customData['nummer'];
   switch ($contactData['contact_type']) {
     case 'Individual':
       $donorData['type'] = 'Person';
-      $donorData['number'] = $customData['personsnummer'];
       break;
     case 'Household':
       $donorData['type'] = 'Husholdning';
-      $donorData['number'] = $customData['personsnummer'];
     break;
     case 'Organization':
-      $donorData['type'] = 'Organisasjon';
-      $donorData['number'] = $customData['organisasjonsnummer'];
     break;
   }
   return $donorData;
@@ -192,22 +189,26 @@ function pullDonorData($contactData) {
  * Function to get custom data for person/organisasjonsnummer
  * 
  * @param int $contactId
+ * @param string $contactType
  * @return array $customData
  */
-function getCustomData($contactId) {
+function getCustomData($contactId, $contactType) {
   $config = CRM_Oppgavexml_Config::singleton();
-  $tableName = $config->get_contact_custom_group_table();
-  $columnPerson = $config->get_personsnummer_custom_field_column();
-  $columnOrg = $config->get_organisasjonsnummer_custom_field_column();
-  $query = ' SELECT * FROM '.$tableName.' WHERE entity_id = %1';
+  // action depends on contact type
+  if ($contactType == 'Organization') {
+    $tableName = $config->getMafOrganisationCustomGroupTableName();
+    $columnName = $config->getMafOrganisasjonsNummerColumnName();
+  } else {
+    $tableName = $config->getMafPersonCustomGroupTableName();
+    $columnName = $config->getMafPersonNummerColumnName();
+  }
+  $query = ' SELECT '.$columnName.' FROM '.$tableName.' WHERE entity_id = %1';
   $params = array(1 => array($contactId, 'Positive'));
   $dao = CRM_Core_DAO::executeQuery($query, $params);
   if ($dao->fetch()) {
-    $customData['personsnummer'] = $dao->$columnPerson;
-    $customData['organisasjonsnummer'] = $dao->$columnOrg;
+    $customData['nummer'] = $dao->$columnName;
   } else {
-    $customData['personsnummer'] = '';
-    $customData['organisasjonsnummer'] = '';
+    $customData['nummer'] = '';
   }
   return $customData;
 }

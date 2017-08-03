@@ -35,6 +35,7 @@ class CRM_Oppgavexml_BAO_Oppgave extends CRM_Oppgavexml_DAO_Oppgave {
     }
     return $result;
   }
+
   /**
    * Function to add or update oppgave
    * 
@@ -43,6 +44,7 @@ class CRM_Oppgavexml_BAO_Oppgave extends CRM_Oppgavexml_DAO_Oppgave {
    * @return array $result
    * @access public
    * @static
+   * @throws Exception when params invalid
    */
   public static function add($params) {
     $result = array();
