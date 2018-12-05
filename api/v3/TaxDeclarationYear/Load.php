@@ -181,6 +181,7 @@ function pullDonorData($contactData) {
       $donorData['type'] = 'Husholdning';
     break;
     case 'Organization':
+      $donorData['type'] = 'Organisasjon';
     break;
   }
   return $donorData;

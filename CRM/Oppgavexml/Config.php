@@ -282,7 +282,7 @@ class CRM_Oppgavexml_Config {
    * @access protected
    */
   protected function set_max_deductible_amount() {
-    $this->_max_deductible_amount = 20000;
+    $this->_max_deductible_amount = 40000;
   }
   /**
    * Function to set the minimum deductible amount
@@ -301,10 +301,10 @@ class CRM_Oppgavexml_Config {
     $this->_sender_kilde_system = 'CiviCRM';
     $this->_sender_organisasjonsnummer = '980421899';
     $this->_sender_organisasjonsnavn = 'Mission Aviation Fellowship Norge';
-    $this->_sender_kontakt_navn = 'Steinar Sødal';
-    $this->_sender_kontakt_telefon = '90576090';
-    $this->_sender_kontakt_mobil = '90576090';
-    $this->_sender_kontakt_epost = 'steinar@maf.no';
+    $this->_sender_kontakt_navn = 'Clare Wilshaw';
+    $this->_sender_kontakt_telefon = '45515358';
+    $this->_sender_kontakt_mobil = '45515358';
+    $this->_sender_kontakt_epost = 'clare@maf.no';
     $this->_leveranse_type = 'ordinaer';
   }
   /**
