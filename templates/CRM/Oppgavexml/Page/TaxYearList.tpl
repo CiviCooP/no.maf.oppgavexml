@@ -3,6 +3,14 @@
     The existing Tax Declaration Years are listed below. You can manage or delete them from this screen 
     (depending on the status of the year selected). 
   </div>
+  <div class="crm-block crm-form-block">
+    <form action="{crmURL p='civicrm/oppgave/load'}" method="GET">
+      <div class="form-layout">
+        <label for="year">{ts}Year{/ts}</label> <input type="text" name="year" size="4" value="{$current_year}" class="small crm-form-text" />
+        <input type="submit" value="{ts}Load{/ts}" class="crm-form-submit default" />
+      </div>
+    </form>
+  </div>
   <div id="skatteinnberetninger_wrapper" class="dataTables_wrapper">
     <table id="skatteinnberetninger-table" class="display">
       <thead>
@@ -23,6 +31,7 @@
                 {foreach from=$year_data.actions item=action_link}
                   {$action_link}
                 {/foreach}
+
               </span>
             </td>
           </tr>

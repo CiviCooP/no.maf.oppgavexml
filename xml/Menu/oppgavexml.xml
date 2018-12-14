@@ -18,4 +18,10 @@
     <title>Oppgave</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/oppgave/load</path>
+    <page_callback>CRM_Oppgavexml_Page_Load</page_callback>
+    <title>Oppgave</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
