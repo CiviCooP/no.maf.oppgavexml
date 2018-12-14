@@ -15,6 +15,7 @@ class CRM_Oppgavexml_Page_TaxYearList extends CRM_Core_Page {
     $this->set_page_configuration();
     $skatteinnberetninger = $this->get_skatteinnberetninger();
     $this->assign('skatteinnberetninger', $skatteinnberetninger);
+    $this->assign('current_year', date('Y'));
     parent::run();
   }
   /**
@@ -29,12 +30,14 @@ class CRM_Oppgavexml_Page_TaxYearList extends CRM_Core_Page {
     $page_actions = array();
     $status_label = CRM_OppgaveXml_OptionGroup::get_status_option_label($status_id);
     $manage_url = CRM_Utils_System::url('civicrm/oppgavelist', 'year='.$tax_year.'&cid=&dt=');
+    $reload_url = CRM_Utils_System::url('civicrm/oppgave/load', 'year='.$tax_year);
     $delete_url = CRM_Utils_System::url('civicrm/skatteinnberetninger', 'action=delete&year='.$tax_year, true);
     if ($status_label == ' New') {
       $page_actions[] = '<a class="action-item" title="Delete" href="'.$delete_url.'">Delete</a>';      
     } else {
       $page_actions[] = '<a class="action-item" title="Manage" href="'.$manage_url.'">Manage</a>';
     }
+    $page_actions[] = '<a class="action-item" title="Reload" href="'.$reload_url.'">Reload</a>';
     return $page_actions;
   }
   /**
