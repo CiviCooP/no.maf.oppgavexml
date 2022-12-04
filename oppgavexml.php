@@ -125,13 +125,16 @@ function oppgavexml_civicrm_navigationMenu( &$params ) {
  * 
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_tabs
  */
-function oppgavexml_civicrm_tabs(&$tabs, $contact_id) {
-  $oppgave_count = CRM_Oppgavexml_BAO_Oppgave::get_contact_count($contact_id);
-  $oppgave_url = CRM_Utils_System::url('civicrm/oppgavelist','snippet=1&cid='.$contact_id);
-  $tabs[] = array( 
-    'id'    => 'contact_oppgave',
-    'url'       => $oppgave_url,
-    'title'     => 'Årsoppgave',
-    'weight'    => 99,
-    'count'     => $oppgave_count);
+function oppgavexml_civicrm_tabset($tabsetName, &$tabs, $context) {
+  if ($tabsetName === 'civicrm/contact/view') {
+    $oppgave_count = CRM_Oppgavexml_BAO_Oppgave::get_contact_count($context['contact_id']);
+    $oppgave_url = CRM_Utils_System::url('civicrm/oppgavelist', 'snippet=1&cid=' . $context['contact_id']);
+    $tabs[] = [ 
+      'id'        => 'contact_oppgave',
+      'url'       => $oppgave_url,
+      'title'     => 'Årsoppgave',
+      'weight'    => 99,
+      'count'     => $oppgave_count,
+    ];
+  }
 }
