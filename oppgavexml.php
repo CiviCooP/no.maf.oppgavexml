@@ -126,7 +126,7 @@ function oppgavexml_civicrm_navigationMenu( &$params ) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_tabs
  */
 function oppgavexml_civicrm_tabset($tabsetName, &$tabs, $context) {
-  if ($tabsetName === 'civicrm/contact/view' && !empty($context['contact_id'])) {
+  if ($tabsetName === 'civicrm/contact/view') {
     $oppgave_count = CRM_Oppgavexml_BAO_Oppgave::get_contact_count($context['contact_id']);
     $oppgave_url = CRM_Utils_System::url('civicrm/oppgavelist', 'snippet=1&cid=' . $context['contact_id']);
     $tabs[] = [ 
