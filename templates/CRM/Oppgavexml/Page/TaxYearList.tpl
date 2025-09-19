@@ -7,7 +7,7 @@
     <form action="{crmURL p='civicrm/oppgave/load'}" method="GET">
       <div class="form-layout">
         <label for="year">{ts}Year{/ts}</label> <input type="text" name="year" size="4" value="{$current_year}" class="small crm-form-text" />
-        <input type="submit" value="{ts}Load{/ts}" class="crm-form-submit default" />
+        <input type="submit" value="{ts escape='htmlattribute'}Load{/ts}" class="crm-form-submit default" />
       </div>
     </form>
   </div>
