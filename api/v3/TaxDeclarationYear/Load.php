@@ -158,7 +158,7 @@ function oppgavexml_getDonorData($contactId) {
   try {
     $contactData = civicrm_api3('Contact', 'Getsingle', $params);
     $donorData = oppgavexml_pullDonorData($contactData);
-  } catch (CiviCRM_API3_Exception $ex) {
+  } catch (CRM_Core_Exception $ex) {
     $donorData = array();
   }
   return $donorData;
@@ -230,23 +230,23 @@ function oppgavexml_createSkatteinnberetninger($params) {
  * Function to validate incoming params
  * 
  * @param array $params
- * @throws API_Exception when no param year found
- * @throws API_Exception when param year is empty
- * @throws API_Exception when param year is not 4 digits long
- * @throws API_Exception when param year is not numeric
+ * @throws CRM_Core_Exception when no param year found
+ * @throws CRM_Core_Exception when param year is empty
+ * @throws CRM_Core_Exception when param year is not 4 digits long
+ * @throws CRM_Core_Exception when param year is not numeric
  */
 function oppgavexml_validateParams(&$params) {
   if (!array_key_exists('year', $params)) {
-    throw new API_Exception('Year is a mandatory param but is not found in passed params');
+    throw new CRM_Core_Exception('Year is a mandatory param but is not found in passed params');
   }
   if (empty($params['year'])) {
-    throw new API_Exception('Param year can not be empty');
+    throw new CRM_Core_Exception('Param year can not be empty');
   }
   if (strlen($params['year']) != 4) {
-    throw new API_Exception('Year has to have 4 digits');
+    throw new CRM_Core_Exception('Year has to have 4 digits');
   }
   if (!is_numeric($params['year'])) {
-    throw new API_Exception('Year has to be numeric');
+    throw new CRM_Core_Exception('Year has to be numeric');
   }
 }
 /**
