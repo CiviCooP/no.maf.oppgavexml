@@ -24,7 +24,7 @@ class CRM_OppgaveXml_OptionGroup {
       );
       try {
         $option_group = civicrm_api3('OptionGroup', 'Create', $params);
-      } catch (CiviCRM_API3_Exception $ex) {
+      } catch (CRM_Core_Exception $ex) {
         throw new Exception('Could not create option group tax_declaration_year_status, '
           . 'error from API OptionGroup Create: '.$ex->getMessage());      
       }
@@ -61,7 +61,7 @@ class CRM_OppgaveXml_OptionGroup {
       'return' => 'id');
     try {
       $option_group_id = civicrm_api3('OptionGroup', 'Getvalue', $option_group_params);
-    } catch (CiviCRM_API3_Exception $ex) {
+    } catch (CRM_Core_Exception $ex) {
       throw new Exception('Could not find option group with name tax_declaration_year_status, '
         . 'error from API OptionGroup Getvalue: '.$ex->getMessage());
     }
@@ -71,7 +71,7 @@ class CRM_OppgaveXml_OptionGroup {
       'return' => 'value');
     try {
       $value = civicrm_api3('OptionValue', 'Getvalue', $option_value_params);
-    } catch (CiviCRM_API3_Exception $ex) {
+    } catch (CRM_Core_Exception $ex) {
       $value = '';
     }
     return $value;
@@ -89,7 +89,7 @@ class CRM_OppgaveXml_OptionGroup {
       'return' => 'id');
     try {
       $option_group_id = civicrm_api3('OptionGroup', 'Getvalue', $option_group_params);
-    } catch (CiviCRM_API3_Exception $ex) {
+    } catch (CRM_Core_Exception $ex) {
       throw new Exception('Could not find option group with name tax_declaration_year_status, '
         . 'error from API OptionGroup Getvalue: '.$ex->getMessage());
     }
@@ -99,7 +99,7 @@ class CRM_OppgaveXml_OptionGroup {
       'return' => 'label');
     try {
       $label = civicrm_api3('OptionValue', 'Getvalue', $option_value_params);
-    } catch (CiviCRM_API3_Exception $ex) {
+    } catch (CRM_Core_Exception $ex) {
       $label = '';
     }
     return $label;
@@ -126,7 +126,7 @@ class CRM_OppgaveXml_OptionGroup {
       try {
         civicrm_api3('OptionValue', 'Create', $params);
         $value++;
-      } catch (CiviCRM_API3_Exception $ex) {
+      } catch (CRM_Core_Exception $ex) {
         throw new Exception('Could not create option value '.$status_label.' in option group '
           .$option_group_id.', error from API OptionValue Create: '.$ex->getMessage());
       }

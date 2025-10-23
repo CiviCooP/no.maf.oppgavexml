@@ -329,7 +329,7 @@ class CRM_Oppgavexml_Config {
     try {
       $customGroup = civicrm_api3('CustomGroup', 'getsingle', array('name' => $customGroupName,));
     }
-    catch (CiviCRM_API3_Exception $ex) {
+    catch (CRM_Core_Exception $ex) {
       throw new Exception('Could not find a custom group with name '.$customGroupName.' in '.__METHOD__
         .', contact your system administrator. Error from API CustomGroup getsingle : '.$ex->getMessage());
     }
@@ -341,7 +341,7 @@ class CRM_Oppgavexml_Config {
         'return' => 'column_name',
       ));
     }
-    catch (CiviCRM_API3_Exception $ex) {
+    catch (CRM_Core_Exception $ex) {
       throw new Exception('Could not find a custom field with name '.$customFieldName.' within custom group '
         .$customGroupName.' in '.__METHOD__.', contact your system administrator. Error from API CustomField getvalue : '
         .$ex->getMessage());
