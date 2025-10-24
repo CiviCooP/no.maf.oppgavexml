@@ -245,11 +245,11 @@ class CRM_Oppgavexml_Form_Oppgave extends CRM_Core_Form {
     $min_amount = $oppgave_config->get_min_deductible_amount();
     $max_amount = $oppgave_config->get_max_deductible_amount();
     if ($fields['deductible_amount'] < $min_amount) {
-      $errors['deductible_amount'] = ts('Amount can not be less than '.$min_amount);
+      $errors['deductible_amount'] = ts('Amount can not be less than %1', [1 => $min_amount]);
       return $errors;
     }
     if ($fields['deductible_amount'] > $max_amount) {
-      $errors['deductible_amount'] = ts('Amount can not be more than '.$max_amount);
+      $errors['deductible_amount'] = ts('Amount can not be more than %1', [1 => $max_amount]);
       return $errors;
     }
     return TRUE;
